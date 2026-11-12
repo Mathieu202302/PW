@@ -327,13 +327,13 @@ function renderHome(){
 
 /* ---- Photography and My life (same gallery, different data) ----
    Every preview in a gallery has the same width: 1 column on phones, 2 on tablets, 3 on desktop.
-   Wide photos are shown at 3:2 and tall photos at 2:3. Columns all start at the same top edge, and each photo goes
+   Wide photos are shown at 3:2 and tall photos at 1:2 (width:height). Columns all start at the same top edge, and each photo goes
    into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
   main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) +
     '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
   var grid = $('#grid'), items = [], nodes = [], laidW = 0;
-  function ratioOf(p){ return (!p.video && p.h > p.w) ? 2 / 3 : 3 / 2; }
+  function ratioOf(p){ return (!p.video && p.h > p.w) ? 1 / 2 : 3 / 2; }
   function layout(){
     var W = grid.clientWidth; if(!W || !nodes.length) return;
     laidW = W;
@@ -394,6 +394,10 @@ function youtubeHTML(y){
     '<div class="yt-frame" data-v="'+esc(y.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
       '<img src="'+ytThumb(y.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
 }
+function shopHTML(sh){
+  return '<div class="shop"><div><h3>'+esc(L(sh.title))+'</h3><p>'+esc(L(sh.text))+'</p></div>' +
+    '<a class="btn solid" href="'+esc(sh.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('shop_visit'))+'</a></div>';
+}
 function playYouTube(box){
   var f = document.createElement('iframe');
   f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(box.getAttribute('data-v')) + '?autoplay=1&rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en');
@@ -417,7 +421,7 @@ function renderCollections(){
     $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
       lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
-      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid">' +
+      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid">' +
         c.items.map(function(it, i){
           return '<button type="button" class="tile" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
             '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +

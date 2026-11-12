@@ -3,7 +3,7 @@
    Photos load from Google Drive: put the picture in a Drive folder shared as "Anyone with the link: Viewer",
    copy the file id from its link (drive.google.com/file/d/FILE_ID/view) and write drive: 'FILE_ID' on the entry.
    w and h only need to say whether the photo is wide (w bigger) or tall (h bigger): the gallery shows wide photos
-   at 3:2 and tall photos at 2:3. caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
+   at 3:2 and tall photos at 1:2 (width:height). caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   profile: {
@@ -137,6 +137,8 @@ window.SITE = {
   /* Collections: each has items. Items without src show generated placeholder art (kind: bricks or car). */
   collections: [
     {id: 'lego', name: {en: 'LEGO', zh: '樂高'}, blurb: {en: 'Sets I have built and kept.', zh: '我組好並收藏的樂高。'},
+     /* My LEGO shop, shown at the top of this collection. The block stays hidden if url is empty. */
+     shop: {url: 'https://mall.iopenmall.tw/020343/', title: {en: 'My LEGO shop', zh: '我的樂高商店'}, text: {en: 'Trading and selling my collections!', zh: '我的收藏品開放交換與出售！'}},
      items: [
        {id: 'l1', drive: '1hKA481EY6_se5KQP57ZNuEtaRkAGH6rG', w: 1600, h: 2400,
         title: {en: 'LEGO castle', zh: '樂高城堡'},
@@ -161,14 +163,14 @@ window.SITE = {
      A video is {id, album, title, w: 1600, h: 900, video: "ID"}, where ID is the part after v= in the YouTube link. */
   life: {
     albums: [
-      {id: 'moments', name: {en: 'Moments', zh: '生活點滴'}},
-      {id: 'videos',  name: {en: 'Videos',  zh: '影片'}}
+      {id: 'moments', name: {en: 'Moments', zh: '生活點滴'}}
+      /* To add videos later: add an album {id: 'videos', name: {en: 'Videos', zh: '影片'}} here (after a comma), then an item
+         {id: 'v1', album: 'videos', title: {...}, w: 1600, h: 900, video: 'YOUTUBE_ID'} below. */
     ],
     items: [
       {id: 'f3273', album: 'moments', drive: '1p3W_pVseHWklwjYSdp1g3lay-EvVi-ZH', w: 1600, h: 1067,
        title: {en: 'With a dog', zh: '與狗狗合照'},
        caption: {en: 'Holding a dog in a green vest.', zh: '抱著穿綠色背心的小狗。'}},
-      {id: 'v1', album: 'videos',  title: {en: 'Sample video',  zh: '範例影片'},   w: 1600, h: 900,  video: 'gVmvFTwi5FQ'},
       {id: 'f5470', album: 'moments', drive: '1QhPwqG4CRrmVjS2ldESM9pocaUvMpiCw', w: 1600, h: 1067,
        title: {en: 'By the lake', zh: '湖邊'},
        caption: {en: 'In a UCSD hoodie by a lake, with mountains behind.', zh: '穿著 UCSD 帽 T，在湖邊與遠山合影。'}}
