@@ -435,8 +435,9 @@ function renderHome(){
    Wide photos are shown at 3:2. A tall photo is exactly as high as two wide ones plus the gap between them, so rows line up. Columns all start at the same top edge, and each photo goes
    into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
-  main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) +
+  main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) + (cfg.top || '') +
     '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
+  var featBox = $('.yt'); if(featBox) featBox.addEventListener('click', function(e){ var y = e.target.closest('.yt-play'); if(y) playYouTube(y.parentNode); });
   var grid = $('#grid'), items = [], nodes = [], laidW = 0;
   function isTall(p){ return !p.video && p.h > p.w; }
   function layout(){
@@ -490,11 +491,11 @@ function renderGallery(cfg){
   onHash(draw); draw();
 }
 function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
-function renderLife(){ renderGallery({albums:S.life.albums, items:S.life.items, h:'life_h', p:'life_p', aria:'life_aria', count:'life_count', countIn:'life_count_in'}); }
+function renderLife(){ var f = S.life.featured; renderGallery({top:(f && f.id ? youtubeHTML(f, 'life_feat_h', 'life_feat_p') : ''), albums:S.life.albums, items:S.life.items, h:'life_h', p:'life_p', aria:'life_aria', count:'life_count', countIn:'life_count_in'}); }
 
 /* ---- Collections ---- */
-function youtubeHTML(y){
-  return '<div class="yt"><div class="yt-copy"><h3>'+esc(t('yt_h'))+'</h3><p>'+esc(t('yt_p'))+'</p>' +
+function youtubeHTML(y, hKey, pKey){
+  return '<div class="yt"><div class="yt-copy"><h3>'+esc(t(hKey || 'yt_h'))+'</h3><p>'+esc(t(pKey || 'yt_p'))+'</p>' +
     '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>' +
     '<div class="yt-frame" data-v="'+esc(y.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
       '<img src="'+ytThumb(y.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
