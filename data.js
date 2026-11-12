@@ -3,11 +3,11 @@
    Photos load from Google Drive: put the picture in a Drive folder shared as "Anyone with the link: Viewer",
    copy the file id from its link (drive.google.com/file/d/FILE_ID/view) and write drive: 'FILE_ID' on the entry.
    w and h only need to say whether the photo is wide (w bigger) or tall (h bigger): the gallery shows wide photos
-   at 3:2 and tall photos at 3:4 (width:height). caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
+   at 3:2, and tall photos as high as two wide photos plus the gap. caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.4821.306.17', date: '2026-11-12'},
+  version: {number: '1.5307.412.58', date: '2026-11-12'},
 
   profile: {
     name: {en: 'Matthew Wang', zh: '馬修'},
