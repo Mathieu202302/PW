@@ -158,7 +158,7 @@ function renderHeader(){
     '<nav class="nav" id="nav" aria-label="'+esc(t('nav_main'))+'"><ul class="nav-list">' + NAV.map(function(n){
       var cur = n.key === page ? ' aria-current="page"' : '';
       if(!n.sub) return '<li class="nav-item"><a class="nav-link" href="'+n.href+'"'+cur+'>'+esc(n.label)+'</a></li>';
-      return '<li class="nav-item has-sub"><a class="nav-link" href="'+n.href+'"'+cur+'>'+esc(n.label)+'</a>' +
+      return '<li class="nav-item has-sub'+(cur ? ' cur' : '')+'"><a class="nav-link" href="'+n.href+'"'+cur+'>'+esc(n.label)+'</a>' +
         '<button type="button" class="caret" aria-expanded="false" aria-haspopup="true" aria-label="'+esc(t('open_menu', n.label))+'"></button>' +
         '<ul class="sub">' + n.sub.map(function(s){ return '<li><a href="'+s.href+'">'+esc(s.label)+'</a></li>'; }).join('') + '</ul></li>';
     }).join('') + '</ul>' +
