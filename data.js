@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.7584.337.12', date: '2026-11-12'},
+  version: {number: '1.8126.351.66', date: '2026-11-12'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -51,6 +51,9 @@ window.SITE = {
     {id: 'objects',    name: {en: 'Objects',    zh: '小物'}}
   ],
   photos: [
+      {id: 'p3141', album: 'city', drive: '1cGvF7HVpHBLF-T0w6F-J-Oc_UNSoKzoF', orig: '1ccNNJsw-Knt7nVCbwGGSAOI3ZbXTqFI_', wm: 1, w: 1536, h: 2048,
+       title: {en: 'Taipei 101', zh: '台北101'},
+       caption: {en: 'The tip of Taipei 101 rising out of low cloud, with palm trees in front.', zh: '台北101的塔尖穿出低垂的雲層，前方是一排棕櫚樹。'}},
       {id: 'p3424', album: 'landscapes', drive: '1zcBgWTG_8y3GKTEmAKptSij_hizYWAw-', orig: '1gkXgxCXFl3cgCHsadrAIayQNQrUI_uvy', wm: 1, w: 1600, h: 1067,
        title: {en: 'Purple meadow', zh: '紫色花田'},
        caption: {en: 'A meadow of purple flowers with a small shed beside it.', zh: '一片紫色花田，旁邊有間小屋。'}},
