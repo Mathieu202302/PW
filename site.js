@@ -135,7 +135,9 @@ function artURI(a, w, h){
 }
 function dims(it){ return {w: it.w || 800, h: it.h || 1000}; }
 function ytThumb(id){ return 'https://i.ytimg.com/vi/' + encodeURIComponent(id) + '/hqdefault.jpg'; }
-function srcOf(it){ var d = dims(it); return it.src || (it.video ? ytThumb(it.video) : artURI(it.art, d.w, d.h)); }
+function driveImg(id, px){ return 'https://lh3.googleusercontent.com/d/' + encodeURIComponent(id) + '=w' + (px || 900); }
+function hasImg(it){ return !!(it.src || it.drive); }
+function srcOf(it, px){ var d = dims(it); return it.src || (it.drive ? driveImg(it.drive, px) : (it.video ? ytThumb(it.video) : artURI(it.art, d.w, d.h))); }
 
 /* ================= Header, navigation, footer ================= */
 function renderHeader(){
@@ -218,7 +220,7 @@ function buildLB(){
   el.className = 'lb'; el.hidden = true; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label', t('lb_viewer'));
   el.innerHTML =
     '<div class="lb-top"><output aria-live="polite"></output><button type="button" class="lb-btn" data-a="close">'+esc(t('close'))+'</button></div>' +
-    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="'+esc(t('prev'))+'">&#8249;</button><img alt=""><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="'+esc(t('next'))+'">&#8250;</button></div>' +
+    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="'+esc(t('prev'))+'">&#8249;</button><img alt="" referrerpolicy="no-referrer"><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="'+esc(t('next'))+'">&#8250;</button></div>' +
     '<div class="lb-cap"></div><div class="lb-strip" role="group" aria-label="'+esc(t('all_images'))+'"></div>';
   document.body.appendChild(el);
   lb = {el:el, img:$('img', el), out:$('output', el), cap:$('.lb-cap', el), strip:$('.lb-strip', el), stage:$('.lb-stage', el)};
@@ -264,10 +266,10 @@ function showLB(){
     f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     lb.stage.insertBefore(f, $('.next', lb.stage));
   } else {
-    lb.img.hidden = false; lb.img.src = it.src; lb.img.alt = it.title;
+    lb.img.hidden = false; lb.img.src = it.src; lb.img.alt = it.note || it.title;
   }
   lb.out.textContent = (lbState.i + 1) + ' / ' + lbState.list.length;
-  lb.cap.innerHTML = esc(it.title) + '<span>' + esc(it.meta) + '</span>';
+  lb.cap.innerHTML = esc(it.title) + (it.note ? '<em>' + esc(it.note) + '</em>' : '') + '<span>' + esc(it.meta) + '</span>';
   $$('button', lb.strip).forEach(function(b, k){
     var on = k === lbState.i; b.setAttribute('aria-current', String(on));
     if(on) b.scrollIntoView({inline:'center', block:'nearest'});
@@ -277,7 +279,7 @@ function openLB(list, i, opener){
   if(!lb) buildLB();
   lbState = {list:list, i:i, opener:opener, auto:true};
   lb.strip.innerHTML = list.map(function(it, k){
-    return '<button type="button" data-j="'+k+'" aria-label="'+esc(t('show', it.title))+'" aria-current="false"><img src="'+it.src+'" alt=""></button>';
+    return '<button type="button" data-j="'+k+'" aria-label="'+esc(t('show', it.title))+'" aria-current="false"><img src="'+(it.thumb || it.src)+'" alt="" referrerpolicy="no-referrer"></button>';
   }).join('');
   lb.el.hidden = false; document.body.style.overflow = 'hidden';
   showLB(); $('[data-a="close"]', lb.el).focus();
@@ -310,7 +312,7 @@ function renderHome(){
       '<div class="ann bl">'+esc(t('ann_bl'))+'</div><div class="ann br">'+esc(t('ann_br'))+'</div></figure>' +
   '</section></div>' +
   '<section class="band"><div class="shell band-in"><h2>'+esc(t('explore'))+'</h2><div class="explore">' +
-    '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo)+'" alt=""><h3>'+esc(t('photography'))+'</h3><p>'+esc(t('ex_photo_p'))+'</p></a>' +
+    '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo, 1200)+'" alt="" referrerpolicy="no-referrer"><h3>'+esc(t('photography'))+'</h3><p>'+esc(t('ex_photo_p'))+'</p></a>' +
     '<a class="ex coll" href="collections.html"><img src="'+(coll.items[0].src || artURI(coll.items[0].art, 1200, 640))+'" alt=""><h3>'+esc(t('collections'))+'</h3><p>'+esc(t('ex_coll_p'))+'</p></a>' +
     '<a class="ex career" href="career.html"><div class="ann">'+esc(t('ann_career'))+'</div><div><h3>'+esc(t('career'))+'</h3><p>'+esc(t('ex_career_p'))+'</p></div></a>' +
     '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>'+esc(t('about'))+'</h3><p>'+esc(t('ex_about_p'))+'</p></a>' +
@@ -339,17 +341,17 @@ function renderGallery(cfg){
     $('#grid').innerHTML = list.map(function(p, i){
       var vid = !!p.video;
       return '<button type="button" class="tile'+(vid ? ' video' : '')+'" data-i="'+i+'" style="aspect-ratio:'+p.w+'/'+p.h+'" aria-label="'+esc(t(vid ? 'open_video' : 'open_photo', L(p.title)))+'">' +
-        '<img src="'+srcOf(p)+'" width="'+p.w+'" height="'+p.h+'" alt="'+esc(L(p.title))+'" loading="lazy">' +
+        '<img src="'+srcOf(p, 800)+'" width="'+p.w+'" height="'+p.h+'" alt="'+esc(p.caption ? L(p.caption) : L(p.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
         '<span class="cap"><b>'+esc(L(p.title))+'</b><span>'+esc(albumNameIn(cfg.albums, p.album))+'</span></span>' +
-        (vid ? '<span class="vbadge" aria-hidden="true"></span>' : (p.src ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>')) + '</button>';
+        (vid ? '<span class="vbadge" aria-hidden="true"></span>' : (hasImg(p) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>')) + '</button>';
     }).join('');
   }
   $('#grid').addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
   $('#grid').addEventListener('click', function(e){
     var tile = e.target.closest('.tile'); if(!tile) return;
     openLB(list.map(function(p){
-      return {src:srcOf(p), video:p.video || '', title:L(p.title),
-        meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (p.src ? '' : t('placeholder_meta')))};
+      return {src:srcOf(p, 2000), thumb:srcOf(p, 160), video:p.video || '', title:L(p.title), note:p.caption ? L(p.caption) : '',
+        meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (hasImg(p) ? '' : t('placeholder_meta')))};
     }), parseInt(tile.getAttribute('data-i'), 10), tile);
   });
   onHash(draw); draw();

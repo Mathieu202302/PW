@@ -162,6 +162,7 @@ h1:focus{outline:none}
 .lb-nav.prev{left:12px}.lb-nav.next{right:12px}
 .lb-cap{padding:10px 20px 6px;text-align:center;color:#fff;font:600 1rem var(--display)}
 .lb-cap span{display:block;margin-top:2px;font:500 .85rem var(--display);color:var(--film-text)}
+.lb-cap em{display:block;max-width:60ch;margin:4px auto 0;font:400 .92rem/1.45 var(--display);font-style:normal;color:#e8e4dc}
 .lb-strip{display:flex;gap:8px;justify-content:center;padding:8px 16px 16px;overflow-x:auto}
 .lb-strip button{flex:0 0 auto;width:56px;height:56px;padding:0;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;opacity:.55;background:#000}
 .lb-strip button[aria-current="true"]{border-color:var(--amber);opacity:1}
@@ -337,3 +338,4 @@ html.standalone,html.standalone body{overscroll-behavior-y:none}
 .ptr[data-state="ready"] .ptr-arrow{transform:rotate(-135deg) translate(-2px,-2px)}
 .ptr[data-state="loading"] .ptr-arrow{width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:var(--amber);border-radius:50%;transform:none;animation:ptrspin .8s linear infinite}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
+.masonry .tile img{height:100%;object-fit:cover}
