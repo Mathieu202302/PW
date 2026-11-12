@@ -118,6 +118,7 @@ h1:focus{outline:none}
 .ex p{margin-top:4px;font:500 .9rem/1.4 var(--display);color:rgba(255,255,255,.85)}
 .ex.photo{grid-column:1/3;grid-row:1/3}
 .ex.coll{grid-column:3/5}
+.ex.coll img{object-position:50% 38%}
 .ex.career{background:var(--film);justify-content:space-between}
 .ex.career::after{display:none}
 .ex.career .ann{position:static;text-shadow:none}
@@ -132,9 +133,12 @@ h1:focus{outline:none}
 }
 
 /* ---------- gallery ---------- */
-.masonry{columns:3 280px;column-gap:16px;padding-bottom:64px}
+.jgrid{padding-bottom:64px}
+.jrow{display:flex;gap:var(--gap,16px);margin-bottom:var(--gap,16px)}
+.jrow.full{justify-content:space-between}
+.jrow .tile{flex:0 0 auto;margin:0;width:auto}
 .tile{position:relative;display:block;width:100%;margin:0 0 16px;padding:0;border:0;background:var(--paper-2);border-radius:4px;overflow:hidden;cursor:zoom-in;break-inside:avoid;-webkit-column-break-inside:avoid;text-align:left}
-.tile img{display:block;width:100%;height:auto;transition:transform .5s ease}
+.tile img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
 .tile:hover img{transform:scale(1.03)}
 .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:36px 14px 12px;color:#fff;background:linear-gradient(to top,rgba(6,9,10,.72),rgba(6,9,10,0));opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s}
 .tile:hover .cap,.tile:focus-visible .cap{opacity:1;transform:none}
@@ -338,4 +342,3 @@ html.standalone,html.standalone body{overscroll-behavior-y:none}
 .ptr[data-state="ready"] .ptr-arrow{transform:rotate(-135deg) translate(-2px,-2px)}
 .ptr[data-state="loading"] .ptr-arrow{width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:var(--amber);border-radius:50%;transform:none;animation:ptrspin .8s linear infinite}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
-.masonry .tile img{height:100%;object-fit:cover}

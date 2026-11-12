@@ -2,7 +2,8 @@
    Text shown on the site is written as {en: '...', zh: '...'} so it can switch between English and Traditional Chinese.
    Photos load from Google Drive: put the picture in a Drive folder shared as "Anyone with the link: Viewer",
    copy the file id from its link (drive.google.com/file/d/FILE_ID/view) and write drive: 'FILE_ID' on the entry.
-   caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
+   w and h only need to say whether the photo is wide (w bigger) or tall (h bigger): the gallery shows wide photos
+   at 3:2 and tall photos at 2:3. caption is the short description shown under the photo in the viewer. An entry can also use src: "yourfile.jpg"
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   profile: {
@@ -47,8 +48,8 @@ window.SITE = {
        title: {en: 'Night lights', zh: '夜色燈海'},
        caption: {en: 'City lights after dark.', zh: '入夜後的城市燈火。'}},
       {id: 'p3236', album: 'pets', drive: '1ygSYpXHSI8H2N6JoBpL-EzZc_zczVsta', w: 1600, h: 1067,
-       title: {en: 'Wrapped up', zh: '裹著毯子'},
-       caption: {en: 'A cream, long-haired dachshund tucked into a blanket.', zh: '奶油色的長毛臘腸狗窩在毯子裡。'}},
+       title: {en: 'Olaf, wrapped up', zh: 'Olaf 裹著毯子'},
+       caption: {en: 'Olaf, my cream long-haired dachshund, tucked into a blanket.', zh: '我的奶油色長毛臘腸狗 Olaf，窩在毯子裡。'}},
       {id: 'p4166', album: 'sky', drive: '1ZW84CBBmwcTZE7bWA-grybpuw7aFmheu', w: 1600, h: 2400,
        title: {en: 'Balloons over the hills', zh: '山丘上的熱氣球'},
        caption: {en: 'Hot air balloons above the hills, with a red train crossing a viaduct below.', zh: '熱氣球飄在山丘上方，下方有一列紅色火車駛過高架橋。'}},
@@ -62,14 +63,11 @@ window.SITE = {
        title: {en: 'Golden figure at dusk', zh: '黃昏的金色雕像'},
        caption: {en: 'A golden winged statue on top of a dome at dusk.', zh: '圓頂上的金色有翼雕像，攝於黃昏。'}},
       {id: 'p3485', album: 'pets', drive: '1aBl064rENlZDzywpFBt0vKr0DR99pTyD', w: 1600, h: 1067,
-       title: {en: 'In the grass', zh: '草地上'},
-       caption: {en: 'A dachshund in a harness, out on the grass.', zh: '穿著胸背帶的臘腸狗，站在草地上。'}},
+       title: {en: 'Olaf in the grass', zh: 'Olaf 在草地上'},
+       caption: {en: 'Olaf, wearing a harness, out on the grass.', zh: '穿著胸背帶的 Olaf，站在草地上。'}},
       {id: 'p3467', album: 'wildlife', drive: '1gSdCMdSWAHNmknke_8Wit6wHjIIBVcEG', w: 1600, h: 1067,
        title: {en: 'Black drongo', zh: '黑捲尾'},
        caption: {en: 'A black drongo perched on a branch.', zh: '棲息在枝頭的黑捲尾。'}},
-      {id: 'p0021', album: 'objects', drive: '1hKA481EY6_se5KQP57ZNuEtaRkAGH6rG', w: 1600, h: 2400,
-       title: {en: 'LEGO castle', zh: '樂高城堡'},
-       caption: {en: 'A castle display built from LEGO, with colorful stars and minifigures.', zh: '以樂高組成的城堡展示，點綴著彩色星星與人偶。'}},
       {id: 'p4140', album: 'sky', drive: '1wcfH1LmZ_llI-lq94I6S06XEl2tBCPIr', w: 1600, h: 1067,
        title: {en: 'Airship', zh: '飛艇'},
        caption: {en: 'An airship and banners in a blue sky.', zh: '藍天裡的飛艇與旗幟。'}},
@@ -98,8 +96,8 @@ window.SITE = {
        title: {en: 'Blue dial', zh: '藍色錶盤'},
        caption: {en: 'A blue-dial watch on a leather strap.', zh: '皮革錶帶搭配藍色錶盤的手錶。'}},
       {id: 'p3442', album: 'pets', drive: '1slvGdb6p1yrNsNd2IKFC9KWKYxtGw7OS', w: 1600, h: 1067,
-       title: {en: 'Resting spot', zh: '小憩片刻'},
-       caption: {en: 'A dachshund lying down on a patch of dirt.', zh: '臘腸狗趴在一塊泥土地上休息。'}},
+       title: {en: 'Olaf resting', zh: 'Olaf 小憩片刻'},
+       caption: {en: 'Olaf lying down on a patch of dirt.', zh: 'Olaf 趴在一塊泥土地上休息。'}},
       {id: 'p4236', album: 'city', drive: '1aMPYowkMCvtT56EBsqFZ3M8bVvK1xb-L', w: 1600, h: 1067,
        title: {en: 'Dusk glow', zh: '暮色'},
        caption: {en: 'Dusk sky behind a lit modern building.', zh: '暮色天空下，一棟亮著燈的現代建築。'}},
@@ -139,12 +137,10 @@ window.SITE = {
   collections: [
     {id: 'lego', name: {en: 'LEGO', zh: '樂高'}, blurb: {en: 'Sets I have built and kept.', zh: '我組好並收藏的樂高。'},
      items: [
-       {id: 'l1', title: {en: 'LEGO set 1', zh: '樂高套組 1'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 3,  hue: 4}},
-       {id: 'l2', title: {en: 'LEGO set 2', zh: '樂高套組 2'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 9,  hue: 210}},
-       {id: 'l3', title: {en: 'LEGO set 3', zh: '樂高套組 3'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 15, hue: 45}},
-       {id: 'l4', title: {en: 'LEGO set 4', zh: '樂高套組 4'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 21, hue: 150}},
-       {id: 'l5', title: {en: 'LEGO set 5', zh: '樂高套組 5'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 27, hue: 280}},
-       {id: 'l6', title: {en: 'LEGO set 6', zh: '樂高套組 6'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 33, hue: 20}}
+       {id: 'l1', drive: '1hKA481EY6_se5KQP57ZNuEtaRkAGH6rG', w: 1600, h: 2400,
+        title: {en: 'LEGO castle', zh: '樂高城堡'},
+        meta: {en: 'Castle display with minifigures', zh: '城堡展示，附人偶'},
+        caption: {en: 'A castle display built from LEGO, with colorful stars and minifigures.', zh: '以樂高組成的城堡展示，點綴著彩色星星與人偶。'}}
      ]},
     {id: 'model-car', name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '收藏我喜歡的車款，以比例模型呈現。'},
      /* Shown at the top of this collection. id is the part after v= in the video link. */
