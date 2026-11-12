@@ -22,10 +22,11 @@ window.SITE = {
     ]
   },
 
-  /* Contact form. Paste the access key from web3forms.com between the quotes.
-     The key is safe to publish. Messages go to the email you used to create it,
-     and that email address never appears on the site. */
-  contact: {accessKey: ''},
+  /* Contact form. Messages are forwarded to your inbox by FormSubmit (formsubmit.co).
+     formId is the random string FormSubmit gave you after you activated the form. It stands in for your email
+     address, so the address itself never appears on the site, and it is safe to publish.
+     (accessKey is an optional alternative: a key from web3forms.com. Leave it empty.) */
+  contact: {formId: 'e7150ffdfb35b916eef77496f1489613', accessKey: ''},
 
   /* Photography: albums and photos. Pictures are fetched from Google Drive by file id. */
   albums: [

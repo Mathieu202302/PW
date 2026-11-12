@@ -326,42 +326,28 @@ function renderHome(){
 }
 
 /* ---- Photography and My life (same gallery, different data) ----
-   Every preview has a fixed shape: wide photos are 3:2 and tall photos are 2:3. All previews in a row share one height,
-   so the rows line up. A short look-ahead fills gaps at the end of a row. */
+   Every preview in a gallery has the same width: 1 column on phones, 2 on tablets, 3 on desktop.
+   Wide photos are shown at 3:2 and tall photos at 2:3. Columns all start at the same top edge, and each photo goes
+   into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
   main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) +
     '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
-  var grid = $('#grid'), items = [], nodes = [], list = [], laidW = 0;
+  var grid = $('#grid'), items = [], nodes = [], laidW = 0;
   function ratioOf(p){ return (!p.video && p.h > p.w) ? 2 / 3 : 3 / 2; }
   function layout(){
     var W = grid.clientWidth; if(!W || !nodes.length) return;
     laidW = W;
-    var g = W < 600 ? 12 : 16;
-    var H = Math.floor(W < 600 ? W / 1.5 : (W - 2 * g) / 4.5);
-    var rest = items.map(function(p, i){ return i; }), rows = [];
-    while(rest.length){
-      var first = rest.shift(), row = [first], used = Math.round(H * ratioOf(items[first]));
-      for(;;){
-        var pick = -1;
-        for(var k = 0; k < Math.min(rest.length, 8); k++){
-          var w = Math.round(H * ratioOf(items[rest[k]]));
-          if(used + g + w <= W){ pick = k; break; }
-        }
-        if(pick < 0) break;
-        used += g + Math.round(H * ratioOf(items[rest[pick]])); row.push(rest.splice(pick, 1)[0]);
-      }
-      rows.push({idx: row, used: used});
-    }
-    grid.innerHTML = ''; grid.style.setProperty('--gap', g + 'px'); list = [];
-    rows.forEach(function(r){
-      var el = document.createElement('div');
-      el.className = 'jrow' + (r.idx.length > 1 && W - r.used <= H * 0.5 ? ' full' : '');
-      r.idx.forEach(function(i){
-        var n = nodes[i]; n.style.width = Math.round(H * ratioOf(items[i])) + 'px'; n.style.height = H + 'px';
-        n.setAttribute('data-i', list.length); list.push(items[i]); el.appendChild(n);
-      });
-      grid.appendChild(el);
+    var g = W < 600 ? 12 : 16, cols = W < 600 ? 1 : (W < 900 ? 2 : 3);
+    var cw = Math.floor((W - (cols - 1) * g) / cols), colH = [], k;
+    for(k = 0; k < cols; k++) colH.push(0);
+    nodes.forEach(function(n, i){
+      var c = 0; for(k = 1; k < cols; k++){ if(colH[k] < colH[c] - 0.5) c = k; }
+      var h = Math.round(cw / ratioOf(items[i]));
+      n.style.width = cw + 'px'; n.style.height = h + 'px';
+      n.style.left = (c * (cw + g)) + 'px'; n.style.top = colH[c] + 'px';
+      colH[c] += h + g;
     });
+    grid.style.height = (Math.max.apply(null, colH) - g) + 'px';
   }
   function draw(){
     var h = location.hash.slice(1) || 'all';
@@ -380,12 +366,13 @@ function renderGallery(cfg){
         (vid ? '<span class="vbadge" aria-hidden="true"></span>' : (hasImg(p) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>')) + '</button>';
     }).join('');
     nodes = Array.prototype.slice.call(tmp.children);
+    grid.innerHTML = ''; nodes.forEach(function(n){ grid.appendChild(n); });
     layout();
   }
   grid.addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
   grid.addEventListener('click', function(e){
     var tile = e.target.closest('.tile'); if(!tile) return;
-    openLB(list.map(function(p){
+    openLB(items.map(function(p){
       return {src:srcOf(p, 2000), thumb:srcOf(p, 160), video:p.video || '', title:L(p.title), note:p.caption ? L(p.caption) : '',
         meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (hasImg(p) ? '' : t('placeholder_meta')))};
     }), parseInt(tile.getAttribute('data-i'), 10), tile);
@@ -475,30 +462,49 @@ function renderAbout(){
 
 /* ---- Contact ---- */
 function renderContact(){
+  function field(id, label, control, hint){
+    return '<div class="fld"><label for="'+id+'">'+esc(label)+'</label>' + control +
+      (hint ? '<p class="fld-hint" id="'+id+'Hint">'+esc(hint)+'</p>' : '') + '<p class="fld-err" id="'+id+'Err" role="alert"></p></div>';
+  }
   main.innerHTML = '<div class="shell">' + pageHead(t('contact_h'), t('contact_p')) +
     '<form class="msg" id="msgForm" novalidate>' +
-      '<label for="msgText">'+esc(t('msg_label'))+'</label>' +
-      '<textarea id="msgText" name="message" rows="9" maxlength="3000" required></textarea>' +
+      field('msgName', t('name_label'), '<input type="text" id="msgName" name="name" autocomplete="name" maxlength="80" required aria-describedby="msgNameErr">') +
+      field('msgEmail', t('email_label'), '<input type="email" id="msgEmail" name="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" maxlength="120" required aria-describedby="msgEmailHint msgEmailErr">', t('email_hint')) +
+      field('msgText', t('msg_label'), '<textarea id="msgText" name="message" rows="9" maxlength="3000" required aria-describedby="msgTextErr"></textarea>') +
       '<input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">' +
       '<div class="msg-row"><button type="submit" class="btn solid" id="msgSend">'+esc(t('send'))+'</button><p class="msg-status" id="msgStatus" role="status" aria-live="polite"></p></div>' +
     '</form></div>';
-  var form = $('#msgForm'), box = $('#msgText'), btn = $('#msgSend'), status = $('#msgStatus');
+  var form = $('#msgForm'), nameEl = $('#msgName'), mailEl = $('#msgEmail'), box = $('#msgText'), btn = $('#msgSend'), status = $('#msgStatus');
+  var MAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   function say(text, kind){ status.textContent = text; status.setAttribute('data-kind', kind || ''); }
+  function flag(el, text){ el.setAttribute('aria-invalid', text ? 'true' : 'false'); $('#' + el.id + 'Err').textContent = text || ''; return !text; }
+  function checkName(){ return flag(nameEl, nameEl.value.trim() ? '' : t('err_name')); }
+  function checkMail(){ return flag(mailEl, MAIL.test(mailEl.value.trim()) ? '' : t('err_email')); }
+  function checkText(){ return flag(box, box.value.trim() ? '' : t('st_empty')); }
+  nameEl.addEventListener('blur', function(){ if(nameEl.value) checkName(); });
+  mailEl.addEventListener('blur', function(){ if(mailEl.value) checkMail(); });
+  [nameEl, mailEl, box].forEach(function(el){ el.addEventListener('input', function(){ if(el.getAttribute('aria-invalid') === 'true'){ if(el === nameEl) checkName(); else if(el === mailEl) checkMail(); else checkText(); } }); });
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    var text = box.value.trim();
-    if(!text){ say(t('st_empty'), 'err'); box.focus(); return; }
+    var okName = checkName(), okMail = checkMail(), okText = checkText();
+    if(!okName){ nameEl.focus(); return; }
+    if(!okMail){ mailEl.focus(); return; }
+    if(!okText){ box.focus(); return; }
     if(form.botcheck.checked){ return; }
-    var key = (S.contact && S.contact.accessKey) || '';
-    if(!key){ say(t('st_noconf'), 'err'); return; }
+    var cfg = S.contact || {}, key = cfg.accessKey || '', fid = cfg.formId || '';
+    if(!key && !fid){ say(t('st_noconf'), 'err'); return; }
+    var who = nameEl.value.trim(), mail = mailEl.value.trim(), subj = 'New message from ' + who + ' (website)';
     btn.disabled = true; say(t('st_sending'), '');
-    fetch('https://api.web3forms.com/submit', {
+    var url = fid ? 'https://formsubmit.co/ajax/' + encodeURIComponent(fid) : 'https://api.web3forms.com/submit';
+    var body = fid ? {name: who, email: mail, message: box.value.trim(), _subject: subj, _captcha: 'false', _template: 'table', _honey: ''}
+                   : {access_key: key, subject: subj, from_name: who, name: who, email: mail, message: box.value.trim()};
+    fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-      body: JSON.stringify({access_key: key, subject: 'New message from my website', from_name: 'Website contact form', message: text})
-    }).then(function(r){ return r.json().then(function(j){ return {ok: r.ok && j.success !== false}; }); })
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json().then(function(j){ return {ok: r.ok && j.success !== false && j.success !== 'false'}; }); })
     .then(function(res){
-      if(res.ok){ box.value = ''; say(t('st_ok'), 'ok'); }
+      if(res.ok){ box.value = ''; nameEl.value = ''; mailEl.value = ''; [nameEl, mailEl, box].forEach(function(el){ el.setAttribute('aria-invalid', 'false'); }); say(t('st_ok'), 'ok'); }
       else { say(t('st_fail'), 'err'); }
     }).catch(function(){ say(t('st_net'), 'err'); })
     .then(function(){ btn.disabled = false; });
@@ -517,11 +523,11 @@ function renderAll(){
 }
 function setLang(next){
   if(next === lang) return;
-  var draft = $('#msgText') ? $('#msgText').value : '';
+  var draft = ['#msgName', '#msgEmail', '#msgText'].map(function(q){ return $(q) ? $(q).value : ''; });
   resetLB(); lang = next;
   try{ sessionStorage.setItem('lang', next); }catch(e){}
   renderAll();
-  if(draft && $('#msgText')) $('#msgText').value = draft;
+  ['#msgName', '#msgEmail', '#msgText'].forEach(function(q, k){ if(draft[k] && $(q)) $(q).value = draft[k]; });
 }
 
 
@@ -546,7 +552,7 @@ function initPTR(){
   function blocked(target){
     if(busy || (lb && !lb.el.hidden)) return true;
     if(target && target.closest && target.closest('textarea, input, iframe, .lb')) return true;
-    var draft = $('#msgText'); if(draft && draft.value.trim()) return true;
+    var drafts = $$('#msgName, #msgEmail, #msgText'); for(var q = 0; q < drafts.length; q++){ if(drafts[q].value.trim()) return true; }
     return false;
   }
   document.addEventListener('touchstart', function(e){
