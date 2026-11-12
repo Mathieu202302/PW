@@ -58,7 +58,7 @@ h1:focus{outline:none}
 .menu-btn{display:none;margin-left:auto;background:transparent;border:1px solid var(--rule);border-radius:4px;padding:7px 12px;font:500 .9rem var(--display);cursor:pointer}
 .menu-btn:hover{border-color:var(--ink)}
 .progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--teal);transform-origin:0 50%;transform:scaleX(0)}
-@media (max-width:820px){
+@media (max-width:900px){
   .menu-btn{display:inline-block}
   .nav{position:absolute;left:0;right:0;top:100%;margin:0;background:var(--paper);border-bottom:1px solid var(--rule);padding:8px 20px 16px;display:none;max-height:calc(100vh - 60px);overflow-y:auto}
   .top.open .nav{display:block}
@@ -244,7 +244,8 @@ h1:focus{outline:none}
 .links{display:flex;flex-wrap:wrap;gap:22px;list-style:none;padding:0}
 .links a{font:600 1rem var(--display);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:2px}
 .links a:hover{color:var(--teal);border-color:var(--teal)}
-.copy{padding-bottom:28px;font:500 .9rem var(--display);color:var(--graphite)}
+.copy{padding-bottom:28px;font:500 .9rem/1.5 var(--display);color:var(--graphite)}
+.copy .legal{margin-top:2px;font-weight:400;font-size:.82rem;max-width:70ch}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
@@ -268,15 +269,15 @@ h1:focus{outline:none}
 .msg-status[data-kind="err"]{color:#9a2f1f}
 
 .foot-id{display:flex;align-items:center;gap:24px}
-.foot-logo{display:block;height:120px;width:auto;flex:none}
-@media (max-width:720px){.brand img{height:22px}.foot-logo{height:88px}.foot-id{gap:16px}}
+.foot-logo{display:block;height:120px;width:auto;flex:none}  /* height is matched to the Say hello block by site.js */
+@media (max-width:720px){.brand img{height:22px}.foot-id{gap:16px}}
 
 /* ---------- language switch ---------- */
 .lang{display:flex;gap:2px;padding:3px;border:1px solid var(--rule);border-radius:999px}
 .lang button{border:0;background:transparent;padding:4px 11px;border-radius:999px;font:600 .8rem var(--display);color:var(--graphite);cursor:pointer}
 .lang button:hover{color:var(--ink)}
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-@media (max-width:820px){.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.lang{align-self:flex-start;margin-top:14px}}
+@media (max-width:900px){.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.lang{align-self:flex-start;margin-top:14px}}
 
 /* ---------- Traditional Chinese (Taiwan) typography ---------- */
 html[lang="zh-Hant-TW"]{
@@ -297,25 +298,36 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 /* ---------- home greeting ---------- */
 .home-hero h1 .hello{display:block;margin-bottom:.45em;font:500 clamp(1.05rem,1.9vw,1.4rem)/1.4 var(--display);font-stretch:100%;letter-spacing:0;color:var(--graphite);text-wrap:balance}
 .home-hero h1 .nm{display:block}
+.home-hero h1 .nm-en{display:inline-block;margin-left:.5em;font:600 .36em/1.2 var(--display);font-stretch:112%;letter-spacing:-.01em;color:var(--graphite);white-space:nowrap;vertical-align:baseline}
 
-/* ---------- YouTube on the Collections page ---------- */
-.yt{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:48px;align-items:center;margin-top:16px;padding:44px 0 80px;border-top:1px solid var(--rule)}
-.yt h2{font:700 1.7rem/1.2 var(--display);font-stretch:112%;letter-spacing:-.01em}
-.yt p{margin-top:10px;color:var(--graphite);font-size:1.05rem;max-width:36ch}
-.yt .btn{margin-top:22px}
+/* ---------- YouTube at the top of the Model car collection ---------- */
+.yt{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:40px;align-items:center;margin:0 0 36px;padding:24px 0 28px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.yt h3{font:700 1.3rem/1.25 var(--display);font-stretch:108%;letter-spacing:-.01em}
+.yt p{margin-top:8px;color:var(--graphite);font-size:1.02rem;max-width:34ch}
+.yt .btn{margin-top:18px}
 .yt-frame{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:var(--film);box-shadow:0 28px 50px -28px rgba(6,9,10,.6)}
 .yt-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .yt-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer}
 .yt-play img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
 .yt-play:hover img{transform:scale(1.03)}
 .yt-play::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(6,9,10,.55),rgba(6,9,10,0) 55%)}
-.yt-btn{position:absolute;z-index:1;left:50%;top:50%;width:76px;height:52px;transform:translate(-50%,-50%);border-radius:14px;background:rgba(6,9,10,.82);border:1px solid var(--film-line);transition:background .15s}
-.yt-btn::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-38%,-50%);border-style:solid;border-width:11px 0 11px 18px;border-color:transparent transparent transparent var(--amber);transition:border-color .15s}
-.yt-play:hover .yt-btn,.yt-play:focus-visible .yt-btn{background:var(--amber)}
-.yt-play:hover .yt-btn::before,.yt-play:focus-visible .yt-btn::before{border-left-color:var(--film)}
-@media (max-width:860px){.yt{grid-template-columns:1fr;gap:24px;padding:36px 0 56px}}
-html[lang="zh-Hant-TW"] .yt h2{letter-spacing:0}
+.yt-btn,.vbadge{position:absolute;z-index:1;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:14px;background:rgba(6,9,10,.82);border:1px solid var(--film-line);transition:background .15s;pointer-events:none}
+.yt-btn{width:76px;height:52px}
+.vbadge{width:60px;height:42px;border-radius:12px}
+.yt-btn::before,.vbadge::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-38%,-50%);border-style:solid;border-color:transparent transparent transparent var(--amber);transition:border-color .15s}
+.yt-btn::before{border-width:11px 0 11px 18px}
+.vbadge::before{border-width:9px 0 9px 15px}
+.yt-play:hover .yt-btn,.yt-play:focus-visible .yt-btn,.tile.video:hover .vbadge,.tile.video:focus-visible .vbadge{background:var(--amber)}
+.yt-play:hover .yt-btn::before,.yt-play:focus-visible .yt-btn::before,.tile.video:hover .vbadge::before,.tile.video:focus-visible .vbadge::before{border-left-color:var(--film)}
+.tile.video{background:var(--film)}
+.tile.video img{height:100%;object-fit:cover}
+@media (max-width:860px){.yt{grid-template-columns:1fr;gap:20px;padding:20px 0 24px}}
+html[lang="zh-Hant-TW"] .yt h3{letter-spacing:0}
 html[lang="zh-Hant-TW"] .yt p{max-width:28em}
+
+/* video player inside the viewer */
+.lb-stage iframe{display:block;width:min(100%,calc((100vh - 230px) * 16 / 9));aspect-ratio:16/9;border:0;border-radius:2px;background:#000}
+@supports (height:1dvh){.lb-stage iframe{width:min(100%,calc((100dvh - 230px) * 16 / 9))}}
 
 /* ---------- pull down to refresh (installed app) ---------- */
 html.standalone,html.standalone body{overscroll-behavior-y:none}

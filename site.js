@@ -3,6 +3,7 @@
 (function(){
 'use strict';
 var S = window.SITE, P = S.profile, I = window.I18N;
+var NAME_EN = (P.name && P.name.en) || P.name;   /* header and footer always show the English name */
 var $ = function(s, r){ return (r||document).querySelector(s); };
 var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
 var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
@@ -11,10 +12,13 @@ var main = $('#main');
 
 /* ================= Language ================= */
 var lang = 'en';
+/* The site opens in the visitor's device language. A choice made with the EN / 中文 switch is kept only
+   for the current visit (all pages), so the next visit starts from the device language again. */
 function detectLang(){
   var q = ''; try{ q = new URLSearchParams(location.search).get('lang') || ''; }catch(e){}
   if(q === 'en' || q === 'zh') return q;
-  try{ var s = localStorage.getItem('lang'); if(s === 'en' || s === 'zh') return s; }catch(e){}
+  try{ localStorage.removeItem('lang'); }catch(e){}
+  try{ var s = sessionStorage.getItem('lang'); if(s === 'en' || s === 'zh') return s; }catch(e){}
   var list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
   for(var i = 0; i < list.length; i++){ if(/^zh/i.test(list[i])) return 'zh'; if(/^en/i.test(list[i])) return 'en'; }
   return 'en';
@@ -130,7 +134,8 @@ function artURI(a, w, h){
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(f(a.seed, w, h, a.hue));
 }
 function dims(it){ return {w: it.w || 800, h: it.h || 1000}; }
-function srcOf(it){ var d = dims(it); return it.src || artURI(it.art, d.w, d.h); }
+function ytThumb(id){ return 'https://i.ytimg.com/vi/' + encodeURIComponent(id) + '/hqdefault.jpg'; }
+function srcOf(it){ var d = dims(it); return it.src || (it.video ? ytThumb(it.video) : artURI(it.art, d.w, d.h)); }
 
 /* ================= Header, navigation, footer ================= */
 function renderHeader(){
@@ -140,11 +145,13 @@ function renderHeader(){
      sub:[{label:t('all_photos'), href:'photography.html'}].concat(S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; }))},
     {key:'collections', label:t('collections'), href:'collections.html',
      sub:[{label:t('all_collections'), href:'collections.html'}].concat(S.collections.map(function(c){ return {label:L(c.name), href:'collections.html#'+c.id}; }))},
+    {key:'life', label:t('life'), href:'life.html',
+     sub:[{label:t('all_life'), href:'life.html'}].concat(S.life.albums.map(function(a){ return {label:L(a.name), href:'life.html#'+a.id}; }))},
     {key:'career', label:t('career'), href:'career.html'},
     {key:'about', label:t('about'), href:'about.html'}
   ];
   h.innerHTML =
-    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="218" alt=""><span>'+esc(L(P.name))+'</span></a>' +
+    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="218" alt=""><span>'+esc(NAME_EN)+'</span></a>' +
     '<button type="button" class="menu-btn" aria-expanded="'+isOpen+'" aria-controls="nav">'+esc(t('menu'))+'</button>' +
     '<nav class="nav" id="nav" aria-label="'+esc(t('nav_main'))+'"><ul class="nav-list">' + NAV.map(function(n){
       var cur = n.key === page ? ' aria-current="page"' : '';
@@ -185,6 +192,14 @@ function bindHeaderOnce(){
   var tick = false;
   addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(function(){ updateProgress(); tick = false; }); } }, {passive:true});
 }
+var footRO = null;
+function syncFooterLogo(){
+  var tx = $('.foot-txt'), logo = $('.foot-logo'); if(!tx || !logo) return;
+  function fit(){ var h = Math.round(tx.getBoundingClientRect().height); if(h > 0) logo.style.height = h + 'px'; }
+  fit();
+  if(footRO){ footRO.disconnect(); footRO = null; }
+  if(window.ResizeObserver){ footRO = new ResizeObserver(fit); footRO.observe(tx); }
+}
 function renderFooter(){
   $('#foot').innerHTML =
     '<div class="shell foot-in"><div class="foot-id"><img class="foot-logo" src="footer-logo.png" width="560" height="560" alt="" aria-hidden="true">' +
@@ -192,11 +207,12 @@ function renderFooter(){
     '<a class="btn solid foot-cta" href="contact.html">'+esc(t('contact_btn'))+'</a></div></div>' +
     '<ul class="links">' +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
-    '</ul></div><p class="shell copy">© 2026 '+esc(L(P.name))+'</p>';
+    '</ul></div><div class="shell copy"><p>'+esc(t('foot_rights', NAME_EN))+'</p><p class="legal">'+esc(t('foot_legal', NAME_EN))+'</p></div>';
+  syncFooterLogo();
 }
 
 /* ================= Lightbox ================= */
-var lb = null, lbState = {list:[], i:0, opener:null};
+var lb = null, lbState = {list:[], i:0, opener:null, auto:false};
 function buildLB(){
   var el = document.createElement('div');
   el.className = 'lb'; el.hidden = true; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label', t('lb_viewer'));
@@ -212,6 +228,7 @@ function buildLB(){
     else if(j){ lbState.i = parseInt(j.getAttribute('data-j'), 10); showLB(); }
     else if(e.target === lb.stage){ closeLB(); }
   });
+  lb.strip.addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
   var sx = null;
   lb.stage.addEventListener('pointerdown', function(e){ sx = e.clientX; });
   lb.stage.addEventListener('pointerup', function(e){
@@ -234,9 +251,21 @@ document.addEventListener('keydown', function(e){
   }
 });
 function step(d){ var n = lbState.list.length; lbState.i = (lbState.i + d + n) % n; showLB(); }
+function clearVideo(){ var f = $('iframe', lb.stage); if(f) f.remove(); }
 function showLB(){
-  var it = lbState.list[lbState.i];
-  lb.img.src = it.src; lb.img.alt = it.title;
+  var it = lbState.list[lbState.i], auto = lbState.auto; lbState.auto = false;
+  clearVideo();
+  if(it.video){
+    lb.img.hidden = true;
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(it.video) + '?rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en') + (auto ? '&autoplay=1' : '');
+    f.title = it.title; f.allowFullscreen = true;
+    f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    lb.stage.insertBefore(f, $('.next', lb.stage));
+  } else {
+    lb.img.hidden = false; lb.img.src = it.src; lb.img.alt = it.title;
+  }
   lb.out.textContent = (lbState.i + 1) + ' / ' + lbState.list.length;
   lb.cap.innerHTML = esc(it.title) + '<span>' + esc(it.meta) + '</span>';
   $$('button', lb.strip).forEach(function(b, k){
@@ -246,7 +275,7 @@ function showLB(){
 }
 function openLB(list, i, opener){
   if(!lb) buildLB();
-  lbState = {list:list, i:i, opener:opener};
+  lbState = {list:list, i:i, opener:opener, auto:true};
   lb.strip.innerHTML = list.map(function(it, k){
     return '<button type="button" data-j="'+k+'" aria-label="'+esc(t('show', it.title))+'" aria-current="false"><img src="'+it.src+'" alt=""></button>';
   }).join('');
@@ -254,7 +283,7 @@ function openLB(list, i, opener){
   showLB(); $('[data-a="close"]', lb.el).focus();
 }
 function closeLB(){
-  lb.el.hidden = true; document.body.style.overflow = '';
+  clearVideo(); lb.el.hidden = true; document.body.style.overflow = '';
   if(lbState.opener && lbState.opener.focus && document.contains(lbState.opener)) lbState.opener.focus({preventScroll:true});
 }
 function resetLB(){ if(lb){ lb.el.remove(); lb = null; document.body.style.overflow = ''; } }
@@ -264,7 +293,7 @@ var hashFn = null, clockT = null;
 function onHash(fn){ if(hashFn) removeEventListener('hashchange', hashFn); hashFn = fn; if(fn) addEventListener('hashchange', fn); }
 function pageHead(title, text){ return '<div class="page-head"><h1 class="display">'+esc(title)+'</h1><p>'+esc(text)+'</p></div>'; }
 function roleList(){ return '<ul class="roles" aria-label="'+esc(t('roles_label'))+'">' + P.roles.map(function(r){ return '<li>'+esc(L(r))+'</li>'; }).join('') + '</ul>'; }
-function albumName(id){ var a = S.albums.filter(function(x){ return x.id === id; })[0]; return a ? L(a.name) : ''; }
+function albumNameIn(albums, id){ var a = albums.filter(function(x){ return x.id === id; })[0]; return a ? L(a.name) : ''; }
 
 /* ---- Home ---- */
 function renderHome(){
@@ -272,7 +301,7 @@ function renderHome(){
   main.innerHTML =
   '<div class="shell"><section class="home-hero" aria-label="'+esc(L(P.name))+'">' +
     '<div class="home-copy">' +
-      '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm">'+esc(L(P.name))+'</span></h1>' +
+      '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm"><span class="nm-main">'+esc(L(P.name))+'</span>'+(lang === 'zh' ? ' <span class="nm-en" lang="en">'+esc(NAME_EN)+'</span>' : '')+'</span></h1>' +
       '<p class="big">'+esc(t('home_big'))+'</p>' + roleList() +
       '<div class="cta"><a class="btn solid" href="photography.html">'+esc(t('cta_photo'))+'</a><a class="btn line" href="about.html">'+esc(t('cta_about'))+'</a></div>' +
     '</div>' +
@@ -294,56 +323,58 @@ function renderHome(){
   clock(); clearInterval(clockT); clockT = setInterval(clock, 20000);
 }
 
-/* ---- Photography ---- */
-function renderPhotography(){
-  main.innerHTML = '<div class="shell">' + pageHead(t('photo_h'), t('photo_p')) +
-    '<nav class="chips" id="chips" aria-label="'+esc(t('albums_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="masonry" id="grid"></div></div>';
+/* ---- Photography and My life (same gallery, different data) ---- */
+function renderGallery(cfg){
+  main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) +
+    '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="masonry" id="grid"></div></div>';
   var list = [];
   function draw(){
     var h = location.hash.slice(1) || 'all';
-    if(h !== 'all' && !S.albums.some(function(a){ return a.id === h; })) h = 'all';
-    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(S.albums).map(function(a){
+    if(h !== 'all' && !cfg.albums.some(function(a){ return a.id === h; })) h = 'all';
+    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(cfg.albums).map(function(a){
       return '<a class="chip" href="#'+a.id+'" aria-current="'+(a.id === h)+'">'+esc(L(a.name))+'</a>';
     }).join('');
-    list = S.photos.filter(function(p){ return h === 'all' || p.album === h; });
-    $('#count').textContent = h === 'all' ? t('photo_count', list.length) : t('photo_count_in', list.length, albumName(h));
+    list = cfg.items.filter(function(p){ return h === 'all' || p.album === h; });
+    $('#count').textContent = h === 'all' ? t(cfg.count, list.length) : t(cfg.countIn, list.length, albumNameIn(cfg.albums, h));
     $('#grid').innerHTML = list.map(function(p, i){
-      return '<button type="button" class="tile" data-i="'+i+'" style="aspect-ratio:'+p.w+'/'+p.h+'" aria-label="'+esc(t('open_photo', L(p.title)))+'">' +
+      var vid = !!p.video;
+      return '<button type="button" class="tile'+(vid ? ' video' : '')+'" data-i="'+i+'" style="aspect-ratio:'+p.w+'/'+p.h+'" aria-label="'+esc(t(vid ? 'open_video' : 'open_photo', L(p.title)))+'">' +
         '<img src="'+srcOf(p)+'" width="'+p.w+'" height="'+p.h+'" alt="'+esc(L(p.title))+'" loading="lazy">' +
-        '<span class="cap"><b>'+esc(L(p.title))+'</b><span>'+esc(albumName(p.album))+'</span></span>' + (p.src ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
+        '<span class="cap"><b>'+esc(L(p.title))+'</b><span>'+esc(albumNameIn(cfg.albums, p.album))+'</span></span>' +
+        (vid ? '<span class="vbadge" aria-hidden="true"></span>' : (p.src ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>')) + '</button>';
     }).join('');
   }
+  $('#grid').addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
   $('#grid').addEventListener('click', function(e){
     var tile = e.target.closest('.tile'); if(!tile) return;
-    openLB(list.map(function(p){ return {src:srcOf(p), title:L(p.title), meta:albumName(p.album) + (p.src ? '' : t('placeholder_meta'))}; }), parseInt(tile.getAttribute('data-i'), 10), tile);
+    openLB(list.map(function(p){
+      return {src:srcOf(p), video:p.video || '', title:L(p.title),
+        meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (p.src ? '' : t('placeholder_meta')))};
+    }), parseInt(tile.getAttribute('data-i'), 10), tile);
   });
   onHash(draw); draw();
 }
+function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
+function renderLife(){ renderGallery({albums:S.life.albums, items:S.life.items, h:'life_h', p:'life_p', aria:'life_aria', count:'life_count', countIn:'life_count_in'}); }
 
 /* ---- Collections ---- */
-function youtubeHTML(){
-  var y = S.youtube; if(!y || !y.id) return '<div style="height:48px"></div>';
-  return '<section class="yt" id="youtube" aria-labelledby="yt-h"><div class="yt-copy"><h2 id="yt-h">'+esc(t('yt_h'))+'</h2><p>'+esc(t('yt_p'))+'</p>' +
+function youtubeHTML(y){
+  return '<div class="yt"><div class="yt-copy"><h3>'+esc(t('yt_h'))+'</h3><p>'+esc(t('yt_p'))+'</p>' +
     '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>' +
-    '<div class="yt-frame" id="ytFrame"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
-      '<img src="https://i.ytimg.com/vi/'+esc(y.id)+'/hqdefault.jpg" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></section>';
+    '<div class="yt-frame" data-v="'+esc(y.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
+      '<img src="'+ytThumb(y.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
 }
-function bindYouTube(){
-  var box = $('#ytFrame'); if(!box || !S.youtube) return;
-  var img = $('img', box); if(img) img.addEventListener('error', function(){ img.remove(); });
-  box.addEventListener('click', function(e){
-    if(!e.target.closest('.yt-play')) return;
-    var f = document.createElement('iframe');
-    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(S.youtube.id) + '?autoplay=1&rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en');
-    f.title = t('yt_frame'); f.allowFullscreen = true;
-    f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-    box.innerHTML = ''; box.appendChild(f); f.focus();
-  });
+function playYouTube(box){
+  var f = document.createElement('iframe');
+  f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(box.getAttribute('data-v')) + '?autoplay=1&rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en');
+  f.title = t('yt_frame'); f.allowFullscreen = true;
+  f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+  f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+  box.innerHTML = ''; box.appendChild(f); f.focus();
 }
 function renderCollections(){
   main.innerHTML = '<div class="shell">' + pageHead(t('coll_h'), t('coll_p')) +
-    '<nav class="chips" id="chips" aria-label="'+esc(t('colls_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div id="colls"></div>' + youtubeHTML() + '</div>';
+    '<nav class="chips" id="chips" aria-label="'+esc(t('colls_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div id="colls"></div><div style="height:48px"></div></div>';
   var lists = {};
   function draw(){
     var h = location.hash.slice(1) || 'all';
@@ -356,7 +387,7 @@ function renderCollections(){
     $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
       lists[c.id] = c.items.map(function(it){ return {src:srcOf(it), title:L(it.title), meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
-      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div><div class="grid">' +
+      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid">' +
         c.items.map(function(it, i){
           return '<button type="button" class="tile" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
             '<img src="'+srcOf(it)+'" alt="'+esc(L(it.title))+'" loading="lazy">' +
@@ -364,11 +395,12 @@ function renderCollections(){
         }).join('') + '</div></section>';
     }).join('');
   }
+  $('#colls').addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
   $('#colls').addEventListener('click', function(e){
+    var yt = e.target.closest('.yt-play'); if(yt){ playYouTube(yt.parentNode); return; }
     var tile = e.target.closest('.tile'); if(!tile) return;
     openLB(lists[tile.getAttribute('data-c')], parseInt(tile.getAttribute('data-i'), 10), tile);
   });
-  bindYouTube();
   onHash(draw); draw();
 }
 
@@ -432,7 +464,7 @@ function renderContact(){
 }
 
 /* ================= Render everything, and switch language ================= */
-var pages = {home:renderHome, photography:renderPhotography, collections:renderCollections, career:renderCareer, about:renderAbout, contact:renderContact};
+var pages = {home:renderHome, photography:renderPhotography, collections:renderCollections, life:renderLife, career:renderCareer, about:renderAbout, contact:renderContact};
 function renderAll(){
   document.documentElement.lang = lang === 'zh' ? 'zh-Hant-TW' : 'en';
   document.title = t('title_' + page);
@@ -444,7 +476,7 @@ function setLang(next){
   if(next === lang) return;
   var draft = $('#msgText') ? $('#msgText').value : '';
   resetLB(); lang = next;
-  try{ localStorage.setItem('lang', next); }catch(e){}
+  try{ sessionStorage.setItem('lang', next); }catch(e){}
   renderAll();
   if(draft && $('#msgText')) $('#msgText').value = draft;
 }

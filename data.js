@@ -48,7 +48,7 @@ window.SITE = {
 
   /* Collections: each has items. Items without src show generated placeholder art (kind: bricks or car). */
   collections: [
-    {id: 'lego', name: {en: 'LEGO', zh: '樂高'}, blurb: {en: 'Sets I have built and kept.', zh: '我組好並收藏的樂高套組。'},
+    {id: 'lego', name: {en: 'LEGO', zh: '樂高'}, blurb: {en: 'Sets I have built and kept.', zh: '我組好並收藏的樂高。'},
      items: [
        {id: 'l1', title: {en: 'LEGO set 1', zh: '樂高套組 1'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 3,  hue: 4}},
        {id: 'l2', title: {en: 'LEGO set 2', zh: '樂高套組 2'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 9,  hue: 210}},
@@ -57,7 +57,9 @@ window.SITE = {
        {id: 'l5', title: {en: 'LEGO set 5', zh: '樂高套組 5'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 27, hue: 280}},
        {id: 'l6', title: {en: 'LEGO set 6', zh: '樂高套組 6'}, meta: {en: 'Add the set name and number', zh: '請補上套組名稱與編號'}, art: {kind: 'bricks', seed: 33, hue: 20}}
      ]},
-    {id: 'model-car', name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '我喜歡的車款，以比例模型收藏。'},
+    {id: 'model-car', name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '收藏我喜歡的車款，以比例模型呈現。'},
+     /* Shown at the top of this collection. id is the part after v= in the video link. */
+     youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ'},
      items: [
        {id: 'm1', title: {en: 'Model car 1', zh: '模型車 1'}, meta: {en: 'Add the make, model and scale', zh: '請補上廠牌、車型與比例'}, art: {kind: 'car', seed: 2,  hue: 355}},
        {id: 'm2', title: {en: 'Model car 2', zh: '模型車 2'}, meta: {en: 'Add the make, model and scale', zh: '請補上廠牌、車型與比例'}, art: {kind: 'car', seed: 8,  hue: 215}},
@@ -68,8 +70,22 @@ window.SITE = {
      ]}
   ],
 
-  /* YouTube shown at the bottom of the Collections page. id is the part after v= in the video link. */
-  youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ'},
+  /* My life: photos and YouTube videos, grouped like the Photography albums.
+     A photo is {id, album, title, w, h, art} until you add src: "yourfile.jpg".
+     A video is {id, album, title, w: 1600, h: 900, video: "ID"}, where ID is the part after v= in the YouTube link. */
+  life: {
+    albums: [
+      {id: 'moments', name: {en: 'Moments', zh: '生活點滴'}},
+      {id: 'videos',  name: {en: 'Videos',  zh: '影片'}}
+    ],
+    items: [
+      {id: 'f1', album: 'moments', title: {en: 'Life sample 1', zh: '生活範例 1'}, w: 1500, h: 1000, art: {kind: 'hills', seed: 52, hue: 12}},
+      {id: 'v1', album: 'videos',  title: {en: 'Sample video',  zh: '範例影片'},   w: 1600, h: 900,  video: 'gVmvFTwi5FQ'},
+      {id: 'f2', album: 'moments', title: {en: 'Life sample 2', zh: '生活範例 2'}, w: 1000, h: 1250, art: {kind: 'city',  seed: 63, hue: 300}},
+      {id: 'f3', album: 'moments', title: {en: 'Life sample 3', zh: '生活範例 3'}, w: 1200, h: 1200, art: {kind: 'hills', seed: 71, hue: 95}},
+      {id: 'f4', album: 'moments', title: {en: 'Life sample 4', zh: '生活範例 4'}, w: 1600, h: 900,  art: {kind: 'hills', seed: 80, hue: 232}}
+    ]
+  },
 
   /* Career: education only, newest first. href makes the school name a link. */
   education: [
