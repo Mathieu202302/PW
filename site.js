@@ -491,7 +491,12 @@ function renderGallery(cfg){
   onHash(draw); draw();
 }
 function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
-function renderLife(){ var f = S.life.featured; renderGallery({top:(f && f.id ? youtubeHTML(f, 'life_feat_h', 'life_feat_p') : ''), albums:S.life.albums, items:S.life.items, h:'life_h', p:'life_p', aria:'life_aria', count:'life_count', countIn:'life_count_in'}); }
+function featHTML(f){
+  return '<div class="yt feat"><div class="yt-copy"><h2 class="feat-t">'+esc(L(f.title))+'</h2></div>' +
+    '<div class="yt-frame" data-v="'+esc(f.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
+      '<img src="'+ytThumb(f.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
+}
+function renderLife(){ var f = S.life.featured; renderGallery({top:(f && f.id ? featHTML(f) : ''), albums:S.life.albums, items:S.life.items, h:'life_h', p:'life_p', aria:'life_aria', count:'life_count', countIn:'life_count_in'}); }
 
 /* ---- Collections ---- */
 function youtubeHTML(y, hKey, pKey){

@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.7340.582.06', date: '2026-11-12'},
+  version: {number: '1.8815.239.73', date: '2026-11-12'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -174,7 +174,7 @@ window.SITE = {
      A video is {id, album, title, w: 1600, h: 900, video: "ID"}, where ID is the part after v= in the YouTube link. */
   life: {
     /* Pinned at the top of the My life page, above the albums. id is the part after v= (or after youtu.be/) in the video link. */
-    featured: {id: 'QpUdVg1Rvlc', url: 'https://youtu.be/QpUdVg1Rvlc'},
+    featured: {id: 'QpUdVg1Rvlc', url: 'https://youtu.be/QpUdVg1Rvlc', title: {en: '2026 USA Grand Tour', zh: '2026 USA Grand Tour'}},
     albums: [
       {id: 'moments', name: {en: 'Moments', zh: '生活點滴'}}
       /* To add videos later: add an album {id: 'videos', name: {en: 'Videos', zh: '影片'}} here (after a comma), then an item

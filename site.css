@@ -372,6 +372,7 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 .yt h3{font:700 1.3rem/1.25 var(--display);font-stretch:108%;letter-spacing:-.01em}
 .yt p{margin-top:8px;color:var(--graphite);font-size:1.02rem;max-width:34ch}
 .yt .btn{margin-top:18px}
+.yt.feat .feat-t{font:700 clamp(1.5rem,2.6vw,2.1rem)/1.15 var(--display);font-stretch:108%;letter-spacing:-.015em}
 .yt-frame{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:var(--film);box-shadow:0 28px 50px -28px rgba(6,9,10,.6)}
 .yt-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .yt-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer}
@@ -389,7 +390,7 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 .tile.video{background:var(--film)}
 .tile.video img{height:100%;object-fit:cover}
 @media (max-width:860px){.yt{grid-template-columns:1fr;gap:20px;padding:20px 0 24px}}
-html[lang="zh-Hant-TW"] .yt h3{letter-spacing:0}
+html[lang="zh-Hant-TW"] .yt h3,html[lang="zh-Hant-TW"] .yt .feat-t{letter-spacing:0}
 html[lang="zh-Hant-TW"] .yt p{max-width:28em}
 
 /* video player inside the viewer */
