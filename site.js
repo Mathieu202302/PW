@@ -113,7 +113,7 @@ var NAV = [
 function renderHeader(){
   var h = $('#top');
   h.innerHTML =
-    '<div class="top-in"><a class="brand" href="index.html"><img src="logo.png" width="560" height="524" alt=""><span>'+esc(P.name)+'</span></a>' +
+    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="219" alt=""><span>'+esc(P.name)+'</span></a>' +
     '<button type="button" class="menu-btn" aria-expanded="false" aria-controls="nav">Menu</button>' +
     '<nav class="nav" id="nav" aria-label="Main"><ul class="nav-list">' + NAV.map(function(n){
       var cur = n.key === page ? ' aria-current="page"' : '';
@@ -154,7 +154,7 @@ function renderHeader(){
 }
 function renderFooter(){
   $('#foot').innerHTML =
-    '<div class="shell foot-in"><div><img class="foot-logo" src="logo.png" width="560" height="524" alt="" aria-hidden="true"><p class="foot-h display">Say hello</p><p class="foot-sub">Send me a message and I will get back to you.</p></div>' +
+    '<div class="shell foot-in"><div class="foot-id"><img class="foot-logo" src="footer-logo.png" width="560" height="560" alt="" aria-hidden="true"><div><p class="foot-h display">Say hello</p><p class="foot-sub">Send me a message and I will get back to you.</p></div></div>' +
     '<div class="foot-actions"><a class="btn solid" href="contact.html">Contact me</a><ul class="links">' +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
     '</ul></div></div><p class="shell copy">© 2026 '+esc(P.name)+'</p>';
