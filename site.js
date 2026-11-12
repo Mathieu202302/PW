@@ -166,8 +166,9 @@ function renderHeader(){
       '<button type="button" lang="en" data-lang="en" aria-pressed="'+(lang === 'en')+'" aria-label="English">EN</button>' +
       '<button type="button" lang="zh-Hant-TW" data-lang="zh" aria-pressed="'+(lang === 'zh')+'" aria-label="繁體中文">中文</button>' +
     '</div>' + themeBtn() + '</div></nav></div><div class="progress" id="progress"></div>';
-  updateProgress();
+  updateProgress(); setHdr();
 }
+function setHdr(){ var h = $('#top'); if(h) document.documentElement.style.setProperty('--hdr', h.offsetHeight + 'px'); }
 var SUN = '<svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>';
 var MOON = '<svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8 8 0 0 1 9.8 4a8 8 0 1 0 10.2 10.2z"/></svg>';
 function themeLabel(){ return t(window.THEME && THEME.get() === 'dark' ? 'theme_to_light' : 'theme_to_dark'); }
@@ -304,10 +305,102 @@ function pageHead(title, text){ return '<div class="page-head"><h1 class="displa
 function roleList(){ return '<ul class="roles" aria-label="'+esc(t('roles_label'))+'">' + P.roles.map(function(r){ return '<li>'+esc(L(r))+'</li>'; }).join('') + '</ul>'; }
 function albumNameIn(albums, id){ var a = albums.filter(function(x){ return x.id === id; })[0]; return a ? L(a.name) : ''; }
 
+/* ---- Home: full-screen opening, then the page ---- */
+var heroPlayed = false, heroBound = false;
+var REDUCED = false; try{ REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+function heroHTML(H){
+  var word = lang === 'zh'
+    ? '<span class="hero-zh">'+esc(t('hero_word'))+'</span>'
+    : '<canvas class="hero-write" aria-hidden="true"></canvas>';
+  return '<section class="hero" id="hero" aria-label="'+esc(t('hero_label'))+'">' +
+    '<img class="hero-bg" src="'+driveImg(H.drive, 2200)+'" alt="'+esc(t('hero_alt'))+'" style="object-position:'+esc(H.pos || '50% 50%')+'" fetchpriority="high" referrerpolicy="no-referrer">' +
+    '<div class="hero-shade"></div>' +
+    '<div class="hero-title" role="img" aria-label="'+esc(t('hero_word'))+'">'+word+'</div>' +
+    '<button type="button" class="scroll-cue" aria-label="'+esc(t('hero_scroll'))+'"><span class="chev"></span><span class="chev"></span></button>' +
+    '<p class="hero-cap">'+esc(L(H.caption))+'</p></section>';
+}
+/* Writes the word "Welcome" like a pen: welcome-write.png holds the letter shapes and, for every pixel, the moment the pen reaches it. */
+function writeWelcome(cv, instant){
+  var img = new Image();
+  img.onload = function(){
+    try{
+      var w = img.naturalWidth, h = img.naturalHeight; cv.width = w; cv.height = h;
+      var oc = document.createElement('canvas'); oc.width = w; oc.height = h;
+      var ox = oc.getContext('2d'); ox.drawImage(img, 0, 0);
+      var src = ox.getImageData(0, 0, w, h).data, n = w * h, A = new Uint8Array(n), T = new Float32Array(n), i;
+      for(i = 0; i < n; i++){ A[i] = src[i * 4]; T[i] = (src[i * 4 + 1] * 256 + src[i * 4 + 2]) / 65535; }
+      var ctx = cv.getContext('2d'), out = ctx.createImageData(w, h), px = new Uint32Array(out.data.buffer);
+      function paint(p){
+        for(var j = 0; j < n; j++){
+          var a = A[j]; if(!a){ px[j] = 0; continue; }
+          var k = (p - T[j]) / 0.02 + 1; k = k <= 0 ? 0 : (k >= 1 ? 1 : k);
+          px[j] = (((a * k) | 0) << 24) | 0xFFFFFF;
+        }
+        ctx.putImageData(out, 0, 0);
+      }
+      if(instant){ paint(1.05); cv.classList.add('on'); return; }
+      var DUR = 3600, DELAY = 700, t0 = 0;
+      paint(0); cv.classList.add('on');
+      (function step(now){
+        if(!document.contains(cv)) return;
+        if(!t0) t0 = now + DELAY;
+        var u = Math.max(0, Math.min(1, (now - t0) / DUR));
+        paint(1.05 * (u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2));
+        if(u < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }catch(e){ cv.parentNode.classList.add('plain'); }
+  };
+  img.onerror = function(){ cv.parentNode.classList.add('plain'); };
+  img.src = 'welcome-write.png';
+}
+function heroTarget(){ var s = $('#start'); return s ? Math.round(s.getBoundingClientRect().top + scrollY - $('#top').offsetHeight) : 0; }
+var heroBusy = false, heroTimer = 0;
+function heroGo(y){
+  heroBusy = true; clearTimeout(heroTimer);
+  scrollTo({top: y, behavior: REDUCED ? 'auto' : 'smooth'});
+  var tries = 0;
+  (function wait(){ if(Math.abs(scrollY - y) < 2 || tries++ > 40){ heroTimer = setTimeout(function(){ heroBusy = false; }, 450); } else setTimeout(wait, 50); })();
+}
+function initHero(H){
+  var hero = $('#hero'), cv = $('.hero-write', hero);
+  hero.classList.toggle('played', heroPlayed || REDUCED);
+  if(cv) writeWelcome(cv, heroPlayed || REDUCED);
+  heroPlayed = true;
+  $('.hero-bg', hero).addEventListener('load', function(){ hero.classList.add('lit'); });
+  if($('.hero-bg', hero).complete) hero.classList.add('lit');
+  $('.scroll-cue', hero).addEventListener('click', function(){ heroGo(heroTarget()); });
+  if(heroBound) return; heroBound = true;
+  /* One scroll or swipe moves between the opening screen and the page. */
+  addEventListener('wheel', function(e){
+    if(!$('#hero') || e.ctrlKey) return;
+    var T = heroTarget(), y = scrollY, dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    if(heroBusy){ if(y <= T + 2) e.preventDefault(); return; }
+    if(dy > 4 && y < T - 1){ e.preventDefault(); heroGo(T); }
+    else if(dy < -4 && ((y > 0 && y <= T + 1) || (y > T && y + dy < T))){ e.preventDefault(); heroGo(0); }
+  }, {passive:false});
+  var y0 = 0;
+  addEventListener('touchstart', function(e){ y0 = e.touches[0].clientY; }, {passive:true});
+  addEventListener('touchend', function(e){
+    if(!$('#hero') || heroBusy) return;
+    var T = heroTarget(), y = scrollY, dy = y0 - e.changedTouches[0].clientY;
+    if(Math.abs(dy) < 30) return;
+    if(dy > 0 && y < T - 1) heroGo(T);
+    else if(dy < 0 && y > 0 && y <= T + 1) heroGo(0);
+  }, {passive:true});
+  addEventListener('keydown', function(e){
+    if(!$('#hero') || e.altKey || e.ctrlKey || e.metaKey) return;
+    var tg = e.target && e.target.tagName; if(tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT' || (e.target && e.target.isContentEditable)) return;
+    var T = heroTarget(), y = scrollY;
+    if((e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) && y < T - 1 && !(tg === 'BUTTON' && e.key === ' ')){ e.preventDefault(); heroGo(T); }
+    else if((e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) && y > 0 && y <= T + 1){ e.preventDefault(); heroGo(0); }
+  });
+}
+
 /* ---- Home ---- */
 function renderHome(){
   var photo = HOME.photo, coll = HOME.coll;
-  main.innerHTML =
+  var H = S.hero;
+  main.innerHTML = (H ? heroHTML(H) : '') + '<div id="start">' +
   '<div class="shell"><section class="home-hero" aria-label="'+esc(L(P.name))+'">' +
     '<div class="home-copy">' +
       '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm"><span class="nm-main">'+esc(L(P.name))+'</span>'+(lang === 'zh' ? ' <span class="nm-en" lang="en">'+esc(NAME_EN)+'</span>' : '')+'</span></h1>' +
@@ -323,7 +416,8 @@ function renderHome(){
     '<a class="ex coll" href="collections.html"><img src="'+srcOf(coll.items[0], 1200)+'" alt="" referrerpolicy="no-referrer"><h3>'+esc(t('collections'))+'</h3><p>'+esc(t('ex_coll_p'))+'</p></a>' +
     '<a class="ex career" href="career.html"><img src="career-bg.jpg" alt="" width="1000" height="675"><div class="ann">'+esc(t('ann_career'))+'</div><div><h3>'+esc(t('career'))+'</h3><p>'+esc(t('ex_career_p'))+'</p></div></a>' +
     '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>'+esc(t('about'))+'</h3><p>'+esc(t('ex_about_p'))+'</p></a>' +
-  '</div></div></section>';
+  '</div></div></section></div>';
+  if(H) initHero(H);
   function clock(){
     var el = $('#clock'); if(!el) return;
     var s = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-TW' : 'en-US', {hour:'numeric', minute:'2-digit', timeZone:P.tz}).format(new Date());
@@ -656,6 +750,7 @@ function syncDrive(){
 
 lang = detectLang();
 bindHeaderOnce();
+addEventListener('resize', setHdr);
 syncDrive();
 renderAll();
 initPTR();
