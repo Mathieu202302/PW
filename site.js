@@ -60,8 +60,42 @@ function boxSVG(seed, w, h, hue){
   svg += '<circle cx="'+(x+bw/2)+'" cy="'+(y+bh*.2)+'" r="'+(bw*.07)+'" fill="hsla(45,90%,80%,.9)"/>';
   return svg + '</svg>';
 }
+function bricksSVG(seed, w, h, hue){
+  var r = rng(seed), svg = head(w, h, [[0,'hsl('+hue+',18%,92%)'],[1,'hsl('+hue+',18%,76%)']]);
+  var W = w*.66, u = W/6, x0 = (w-W)/2, bh = h*.105, y0 = h*.66;
+  var rows = [[3,3],[2,3,1],[3,3],[1,3,2]], cols = [hue, hue+55, hue+190, hue+310, hue+120];
+  svg += '<ellipse cx="'+(w/2)+'" cy="'+(y0+bh+h*.012)+'" rx="'+(W*.62)+'" ry="'+(h*.022)+'" fill="rgba(0,0,0,.16)"/>';
+  rows.forEach(function(row, ri){
+    var x = x0, y = y0 - ri*bh;
+    row.forEach(function(n){
+      var bw = n*u, c = cols[Math.floor(r()*cols.length)];
+      svg += '<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="hsl('+c+',68%,48%)" stroke="rgba(0,0,0,.28)" stroke-width="1.5"/>';
+      for(var k=0; k<n; k++){
+        var sx = x + k*u + u*.2;
+        svg += '<rect x="'+sx+'" y="'+(y-bh*.2)+'" width="'+(u*.6)+'" height="'+(bh*.22)+'" rx="'+(bh*.06)+'" fill="hsl('+c+',68%,56%)" stroke="rgba(0,0,0,.28)" stroke-width="1.5"/>';
+      }
+      x += bw;
+    });
+  });
+  return svg + '</svg>';
+}
+function carSVG(seed, w, h, hue){
+  var cx = w*.12, cw = w*.76, base = h*.58, bh = h*.1, rr = bh*.66;
+  var svg = head(w, h, [[0,'hsl('+hue+',16%,92%)'],[1,'hsl('+hue+',16%,78%)']]);
+  svg += '<rect x="'+(w*.06)+'" y="'+(base+rr)+'" width="'+(w*.88)+'" height="'+(h*.022)+'" fill="hsl('+hue+',14%,34%)"/>';
+  svg += '<ellipse cx="'+(w/2)+'" cy="'+(base+rr)+'" rx="'+(cw*.5)+'" ry="'+(h*.012)+'" fill="rgba(0,0,0,.2)"/>';
+  var P = function(a,b){ return (cx+cw*a).toFixed(1)+','+(base-bh*b).toFixed(1); };
+  svg += '<path d="M'+P(0,0)+' L'+P(0,.9)+' Q'+P(.03,1.05)+' '+P(.14,1.08)+' L'+P(.36,1.1)+' L'+P(.46,2.15)+' L'+P(.7,2.15)+' L'+P(.86,1.14)+' L'+P(.97,1.0)+' L'+P(1,.9)+' L'+P(1,0)+' Z" fill="hsl('+hue+',68%,44%)" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>';
+  svg += '<path d="M'+P(.39,1.2)+' L'+P(.47,2.0)+' L'+P(.58,2.0)+' L'+P(.58,1.2)+' Z M'+P(.61,1.2)+' L'+P(.61,2.0)+' L'+P(.69,2.0)+' L'+P(.8,1.2)+' Z" fill="hsl('+hue+',30%,86%)"/>';
+  svg += '<rect x="'+(cx+cw*.02)+'" y="'+(base-bh*.7)+'" width="'+(cw*.05)+'" height="'+(bh*.22)+'" fill="hsl(48,90%,75%)"/>';
+  [.22,.78].forEach(function(f){
+    var wx = cx + cw*f;
+    svg += '<circle cx="'+wx+'" cy="'+base+'" r="'+rr+'" fill="#1b1f21"/><circle cx="'+wx+'" cy="'+base+'" r="'+(rr*.5)+'" fill="hsl('+hue+',10%,72%)"/><circle cx="'+wx+'" cy="'+base+'" r="'+(rr*.14)+'" fill="#1b1f21"/>';
+  });
+  return svg + '</svg>';
+}
 function artURI(a, w, h){
-  var f = a.kind === 'city' ? citySVG : a.kind === 'box' ? boxSVG : hillsSVG;
+  var f = a.kind === 'city' ? citySVG : a.kind === 'bricks' ? bricksSVG : a.kind === 'car' ? carSVG : a.kind === 'box' ? boxSVG : hillsSVG;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(f(a.seed, w, h, a.hue));
 }
 function dims(it){ return {w: it.w || 800, h: it.h || 1000}; }
@@ -120,22 +154,11 @@ function renderHeader(){
 }
 function renderFooter(){
   $('#foot').innerHTML =
-    '<div class="shell foot-in"><div><p class="foot-h display">Say hello</p><p class="foot-email" id="emailText">'+esc(P.email)+'</p></div>' +
-    '<div class="foot-actions"><button type="button" class="btn solid" data-copy>Copy email</button><ul class="links">' +
+    '<div class="shell foot-in"><div><p class="foot-h display">Say hello</p><p class="foot-sub">Send me a message and I will get back to you.</p></div>' +
+    '<div class="foot-actions"><a class="btn solid" href="contact.html">Contact me</a><ul class="links">' +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
     '</ul></div></div><p class="shell copy">© 2026 '+esc(P.name)+'</p>';
 }
-var toastEl = $('#toast'), toastT;
-function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 2400); }
-function copyEmail(){
-  var p; try{ p = navigator.clipboard.writeText(P.email); }catch(e){ p = Promise.reject(e); }
-  p.then(function(){ toast('Email copied'); }).catch(function(){
-    var el = $('#emailText'), r = document.createRange(), s = window.getSelection();
-    r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); el.scrollIntoView({block:'center'});
-    toast('Email selected. Press Ctrl+C or Cmd+C to copy it.');
-  });
-}
-document.addEventListener('click', function(e){ if(e.target.closest('[data-copy]')) copyEmail(); });
 
 /* ================= Lightbox ================= */
 var lb = null, lbState = {list:[], i:0, opener:null};
@@ -213,8 +236,8 @@ function renderHome(){
   '<div class="shell"><section class="home-hero" aria-label="Introduction">' +
     '<div class="home-copy">' +
       '<h1 class="display">'+esc(P.name)+'</h1>' +
-      '<p class="big">I live in San Diego, where I\'m studying electrical and computer engineering with a focus on medical imaging. Away from class, I take photographs and keep a few collections.</p>' +
-      '<p>This site is where I keep all of it: my photography, my collections, my career so far, and a little about me.</p>' +
+      '<p class="big">I grew up in Tainan, Taiwan, and now live in San Diego, where I\'m earning a master\'s in electrical and computer engineering. I take photographs and collect LEGO and model cars.</p>' +
+      '<ul class="roles" aria-label="About me in three words">' + P.roles.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('') + '</ul>' +
       '<div class="cta"><a class="btn solid" href="photography.html">See my photography</a><a class="btn line" href="about.html">About me</a></div>' +
     '</div>' +
     '<figure class="film"><img src="matthew-portrait.jpg" width="1200" height="1500" alt="Matthew Wang leaning on a railing in sunglasses and a white shirt, with hills and the Hollywood sign behind him">' +
@@ -223,8 +246,8 @@ function renderHome(){
   '</section></div>' +
   '<section class="band"><div class="shell band-in"><h2>Explore</h2><div class="explore">' +
     '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo)+'" alt=""><h3>Photography</h3><p>Albums from my camera.</p></a>' +
-    '<a class="ex coll" href="collections.html"><img src="'+srcOf(coll.items[0])+'" alt=""><h3>Collections</h3><p>Sealed Disney Lorcana and more to come.</p></a>' +
-    '<a class="ex career" href="career.html"><div class="ann">Education\nM.S., ECE\n2025 to 2027</div><div><h3>Career</h3><p>Education, projects and tools.</p></div></a>' +
+    '<a class="ex coll" href="collections.html"><img src="'+(coll.items[0].src || artURI(coll.items[0].art, 1200, 640))+'" alt=""><h3>Collections</h3><p>LEGO and model cars.</p></a>' +
+    '<a class="ex career" href="career.html"><div class="ann">Education\nM.S., ECE\n2025 to 2027</div><div><h3>Career</h3><p>Where I studied.</p></div></a>' +
     '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>About me</h3><p>A bit more about me.</p></a>' +
   '</div></div></section>';
   function clock(){
@@ -292,56 +315,13 @@ function renderCollections(){
 }
 
 /* ---- Career ---- */
-function timeline(items){
-  return '<ul class="tl">' + items.map(function(x){
-    return '<li><span class="tl-when">'+esc(x.when)+'</span><div><div class="tl-t">'+esc(x.title)+(x.sample ? '<span class="tag sample">Sample</span>' : '')+'</div>' +
-      '<p class="tl-s">'+esc(x.sub)+'</p><p class="tl-n">'+esc(x.note)+'</p></div></li>';
-  }).join('') + '</ul>';
-}
 function renderCareer(){
-  var tags = [], filter = 'All';
-  S.projects.forEach(function(p){ p.tags.forEach(function(t){ if(tags.indexOf(t) < 0) tags.push(t); }); });
-  var usage = function(s){ return S.projects.filter(function(p){ return p.tools.indexOf(s) >= 0; }).length; };
-  main.innerHTML = '<div class="shell">' + pageHead('Career', 'School, work and projects.') + '</div>' +
-  '<section class="sec"><div class="shell sec-in"><div><h2>Education</h2></div><div>'+timeline(S.education)+'</div></div></section>' +
-  '<section class="sec"><div class="shell sec-in"><div><h2>Work and research</h2></div><div>'+timeline(S.work)+'</div></div></section>' +
-  '<section class="sec" id="projects"><div class="shell sec-in"><div><h2>Projects</h2><p class="note">Open a row for role, tools and result. Pick a tool below to filter.</p></div><div>' +
-    '<div class="chips" id="pchips" role="group" aria-label="Filter projects"></div><p class="count" id="count" aria-live="polite"></p>' +
-    '<ul class="plist" id="plist">' + S.projects.map(function(p){
-      return '<li class="proj" data-id="'+p.id+'"><button type="button" class="proj-head" id="h-'+p.id+'" aria-expanded="false" aria-controls="d-'+p.id+'">' +
-        '<span class="yr">'+esc(p.year)+'</span><span><span class="ptitle">'+esc(p.title)+'</span><span class="psum">'+esc(p.summary)+'</span></span>' +
-        '<span class="ptags"><span class="tag sample">Sample</span>'+p.tags.map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join('')+'</span><span class="chev" aria-hidden="true"></span></button>' +
-        '<div class="proj-body" id="d-'+p.id+'" role="region" aria-labelledby="h-'+p.id+'"><div class="proj-body-in"><dl><dt>Role</dt><dd>'+esc(p.role)+'</dd><dt>Tools</dt><dd>'+esc(p.toolsText)+'</dd><dt>Result</dt><dd>'+esc(p.result)+'</dd></dl></div></div></li>';
-    }).join('') + '</ul><p class="empty" id="empty" hidden>No project lists that yet. <button type="button" id="clearF">Show all projects</button></p></div></div></section>' +
-  '<section class="sec"><div class="shell sec-in"><div><h2>Toolkit</h2><p class="note">The number is how many projects use it. Select one to see them.</p></div><div class="groups">' +
-    S.skillGroups.map(function(g){
-      return '<div class="group"><h3>'+esc(g.title)+'</h3><ul>' + g.items.map(function(s){
-        return '<li><button type="button" class="skill" data-skill="'+esc(s)+'"><span>'+esc(s)+'</span><b>'+usage(s)+'</b></button></li>';
-      }).join('') + '</ul></div>';
-    }).join('') + '</div></div></section>';
-
-  function apply(){
-    var names = ['All'].concat(tags); if(names.indexOf(filter) < 0) names.push(filter);
-    $('#pchips').innerHTML = names.map(function(n){ return '<button type="button" class="chip" data-f="'+esc(n)+'" aria-pressed="'+(n === filter)+'">'+esc(n)+'</button>'; }).join('');
-    var shown = 0;
-    $$('.proj').forEach(function(li){
-      var p = S.projects.filter(function(x){ return x.id === li.getAttribute('data-id'); })[0];
-      var ok = filter === 'All' || p.tags.indexOf(filter) >= 0 || p.tools.indexOf(filter) >= 0;
-      li.hidden = !ok; if(ok) shown++;
-    });
-    $('#count').textContent = filter === 'All' ? S.projects.length + ' projects' : 'Showing ' + shown + ' of ' + S.projects.length + ' projects for ' + filter;
-    $('#empty').hidden = shown !== 0;
-  }
-  $('#plist').addEventListener('click', function(e){
-    var hd = e.target.closest('.proj-head'); if(!hd) return;
-    var li = hd.parentNode, open = !li.classList.contains('open'); li.classList.toggle('open', open); hd.setAttribute('aria-expanded', String(open));
-  });
-  $('#pchips').addEventListener('click', function(e){ var b = e.target.closest('[data-f]'); if(b){ filter = b.getAttribute('data-f'); apply(); } });
-  $('#clearF').addEventListener('click', function(){ filter = 'All'; apply(); });
-  $$('[data-skill]').forEach(function(b){
-    b.addEventListener('click', function(){ filter = b.getAttribute('data-skill'); apply(); $('#projects').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'}); });
-  });
-  apply();
+  main.innerHTML = '<div class="shell">' + pageHead('Career', 'Where I studied.') + '</div>' +
+  '<section class="sec"><div class="shell sec-in"><div><h2>Education</h2></div><div><ul class="tl">' + S.education.map(function(x){
+    var name = x.href ? '<a href="'+esc(x.href)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a>' : esc(x.title);
+    return '<li><span class="tl-when">'+esc(x.when)+'</span><div><div class="tl-t">'+name+'</div>' +
+      (x.sub ? '<p class="tl-s">'+esc(x.sub)+'</p>' : '') + (x.note ? '<p class="tl-n">'+esc(x.note)+'</p>' : '') + '</div></li>';
+  }).join('') + '</ul></div></div></section>';
 }
 
 /* ---- About ---- */
@@ -349,16 +329,49 @@ function renderAbout(){
   main.innerHTML = '<div class="shell">' + pageHead('About me', 'A little about who I am and what this site is for.') +
   '<figure class="wide"><img src="matthew-wide.jpg" width="1920" height="1080" alt="Matthew Wang leaning on a railing in sunglasses, with hills and the Hollywood sign behind him"></figure>' +
   '<div class="about-grid"><div><h2 class="display" style="font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1">Hi, I\'m Matthew.</h2></div><div class="about-text">' +
-    '<p>I\'m Matthew Wang. I live in San Diego, where I\'m in the second year of a master\'s degree in electrical and computer engineering, on the medical imaging track.</p>' +
-    '<p>I graduate in 2027. Outside of class I take photographs and keep a collection of sealed Disney Lorcana product, and this site is where I keep both, along with my career so far.</p>' +
-    '<p>It is a work in progress. Pages will fill in as I add more photos, more of the collection and more of what I\'ve built.</p>' +
-    '<dl class="facts"><div><dt>Lives in</dt><dd>'+esc(P.location)+'</dd></div><div><dt>Studying</dt><dd>M.S., electrical and computer engineering</dd></div>' +
-    '<div><dt>Track</dt><dd>Medical imaging</dd></div><div><dt>Graduating</dt><dd>2027</dd></div>' +
-    '<div><dt>Outside of class</dt><dd>Photography, collecting</dd></div><div><dt>Best way to reach me</dt><dd>Email, below</dd></div></dl>' +
+    '<p>I\'m Matthew Wang. I grew up in Tainan, Taiwan, and now live in San Diego, where I\'m doing my master\'s degree in electrical and computer engineering at UC San Diego. I expect to graduate in 2027.</p>' +
+    '<p>I like photography, and I collect LEGO and model cars. I also collect some Disney Lorcana cards.</p>' +
+    '<ul class="roles" aria-label="About me in three words">' + P.roles.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('') + '</ul>' +
+    '<p>This site is a work in progress. Pages will fill in as I add more photos and more of my collections.</p>' +
+    '<dl class="facts"><div><dt>Grew up in</dt><dd>Tainan, Taiwan</dd></div><div><dt>Lives in</dt><dd>'+esc(P.location)+'</dd></div>' +
+    '<div><dt>Studying</dt><dd>M.S., electrical and computer engineering</dd></div><div><dt>Graduating</dt><dd>2027</dd></div>' +
+    '<div><dt>Into</dt><dd>Photography, LEGO, model cars, Lorcana cards</dd></div></dl>' +
     '<div class="about-links"><a class="btn solid" href="photography.html">See my photography</a><a class="btn line" href="collections.html">See my collections</a></div>' +
   '</div></div></div>';
 }
 
+/* ---- Contact ---- */
+function renderContact(){
+  main.innerHTML = '<div class="shell">' + pageHead('Send me a message', 'Write your message below and press Send. It goes straight to my inbox.') +
+    '<form class="msg" id="msgForm" novalidate>' +
+      '<label for="msgText">Message</label>' +
+      '<textarea id="msgText" name="message" rows="9" maxlength="3000" required></textarea>' +
+      '<input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">' +
+      '<div class="msg-row"><button type="submit" class="btn solid" id="msgSend">Send</button><p class="msg-status" id="msgStatus" role="status" aria-live="polite"></p></div>' +
+    '</form></div>';
+  var form = $('#msgForm'), box = $('#msgText'), btn = $('#msgSend'), status = $('#msgStatus');
+  function say(t, kind){ status.textContent = t; status.setAttribute('data-kind', kind || ''); }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var text = box.value.trim();
+    if(!text){ say('Write a message first.', 'err'); box.focus(); return; }
+    if(form.botcheck.checked){ return; }
+    var key = (S.contact && S.contact.accessKey) || '';
+    if(!key){ say('The message form is not connected yet. Please try again later.', 'err'); return; }
+    btn.disabled = true; say('Sending...', '');
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({access_key: key, subject: 'New message from my website', from_name: 'Website contact form', message: text})
+    }).then(function(r){ return r.json().then(function(j){ return {ok: r.ok && j.success !== false, j: j}; }); })
+    .then(function(res){
+      if(res.ok){ box.value = ''; say('Sent. Thank you, I will get back to you soon.', 'ok'); }
+      else { say('Your message did not send. Please try again in a moment.', 'err'); }
+    }).catch(function(){ say('Your message did not send. Check your connection and try again.', 'err'); })
+    .then(function(){ btn.disabled = false; });
+  });
+}
+
 renderHeader(); renderFooter();
-({home:renderHome, photography:renderPhotography, collections:renderCollections, career:renderCareer, about:renderAbout})[page]();
+({home:renderHome, photography:renderPhotography, collections:renderCollections, career:renderCareer, about:renderAbout, contact:renderContact})[page]();
 })();

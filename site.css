@@ -239,15 +239,29 @@ h1:focus{outline:none}
 .foot{border-top:1px solid var(--rule);margin-top:24px}
 .foot-in{display:flex;flex-wrap:wrap;gap:28px 48px;justify-content:space-between;align-items:flex-end;padding-top:56px;padding-bottom:36px}
 .foot-h{font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.1}
-.foot-email{margin-top:10px;font:600 1.15rem var(--display);overflow-wrap:anywhere}
 .foot-actions{display:flex;flex-direction:column;gap:18px;align-items:flex-start}
 .links{display:flex;flex-wrap:wrap;gap:22px;list-style:none;padding:0}
 .links a{font:600 1rem var(--display);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:2px}
 .links a:hover{color:var(--teal);border-color:var(--teal)}
 .copy{padding-bottom:28px;font:500 .9rem var(--display);color:var(--graphite)}
-.toast{position:fixed;left:50%;bottom:24px;z-index:90;transform:translate(-50%,12px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:4px;font:500 .9rem var(--display);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px)}
-.toast.on{opacity:1;transform:translate(-50%,0)}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
+
+.foot-sub{margin-top:10px;color:var(--graphite);font-size:1.05rem;max-width:46ch}
+.roles{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:22px 0 0}
+.roles li{font:600 .9rem var(--display);padding:6px 14px;border-radius:999px;background:var(--ink);color:var(--paper)}
+.about-text .roles{margin:0 0 1.4em}
+.tl-t a{color:inherit;text-decoration:none;border-bottom:2px solid var(--teal)}
+.tl-t a:hover{color:var(--teal)}
+.msg{max-width:640px;padding-bottom:88px}
+.msg label{display:block;font:600 1rem var(--display);margin-bottom:8px}
+.msg textarea{display:block;width:100%;min-height:220px;padding:14px 16px;border:1px solid var(--graphite);border-radius:4px;background:var(--paper);color:var(--ink);font:400 1.05rem/1.55 var(--serif);resize:vertical}
+.msg textarea:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.msg .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.msg-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-top:16px}
+.btn:disabled{opacity:.55;cursor:wait}
+.msg-status{font:500 .98rem var(--display);color:var(--graphite)}
+.msg-status[data-kind="ok"]{color:var(--teal)}
+.msg-status[data-kind="err"]{color:#9a2f1f}
