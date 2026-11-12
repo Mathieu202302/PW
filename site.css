@@ -352,3 +352,4 @@ html.standalone,html.standalone body{overscroll-behavior-y:none}
 .shop h3{font:700 1.3rem/1.25 var(--display);font-stretch:108%;letter-spacing:-.01em}
 .shop p{margin-top:6px;color:var(--graphite);font-size:1.02rem}
 html[lang="zh-Hant-TW"] .shop h3{letter-spacing:0}
+.copy .ver{font-size:.78rem;color:var(--graphite)}

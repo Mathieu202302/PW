@@ -209,7 +209,7 @@ function renderFooter(){
     '<a class="btn solid foot-cta" href="contact.html">'+esc(t('contact_btn'))+'</a></div></div>' +
     '<ul class="links">' +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
-    '</ul></div><div class="shell copy"><p>'+esc(t('foot_rights', NAME_EN))+'</p><p class="legal">'+esc(t('foot_legal', NAME_EN))+'</p></div>';
+    '</ul></div><div class="shell copy"><p>'+esc(t('foot_rights', NAME_EN))+'</p><p class="legal">'+esc(t('foot_legal', NAME_EN))+'</p>'+versionHTML()+'</div>';
   syncFooterLogo();
 }
 
@@ -393,6 +393,12 @@ function youtubeHTML(y){
     '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>' +
     '<div class="yt-frame" data-v="'+esc(y.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
       '<img src="'+ytThumb(y.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
+}
+function versionHTML(){
+  var v = S.version; if(!v || !v.number) return '';
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v.date || ''), when = v.date || '';
+  if(m){ try{ when = new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {year:'numeric', month:lang === 'zh' ? 'long' : 'short', day:'numeric'}); }catch(e){} }
+  return '<p class="legal ver">'+esc(t('foot_version', v.number, when))+'</p>';
 }
 function shopHTML(sh){
   return '<div class="shop"><div><h3>'+esc(L(sh.title))+'</h3><p>'+esc(L(sh.text))+'</p></div>' +
