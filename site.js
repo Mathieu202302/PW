@@ -113,7 +113,7 @@ var NAV = [
 function renderHeader(){
   var h = $('#top');
   h.innerHTML =
-    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="219" alt=""><span>'+esc(P.name)+'</span></a>' +
+    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="218" alt=""><span>'+esc(P.name)+'</span></a>' +
     '<button type="button" class="menu-btn" aria-expanded="false" aria-controls="nav">Menu</button>' +
     '<nav class="nav" id="nav" aria-label="Main"><ul class="nav-list">' + NAV.map(function(n){
       var cur = n.key === page ? ' aria-current="page"' : '';
