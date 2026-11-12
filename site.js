@@ -318,7 +318,7 @@ function resetLB(){ if(lb){ lb.el.remove(); lb = null; document.body.style.overf
 /* ================= Pages ================= */
 var hashFn = null, clockT = null;
 function onHash(fn){ if(hashFn) removeEventListener('hashchange', hashFn); hashFn = fn; if(fn) addEventListener('hashchange', fn); }
-function pageHead(title, text){ return '<div class="page-head"><h1 class="display">'+esc(title)+'</h1><p>'+esc(text)+'</p></div>'; }
+function pageHead(title, text){ return '<div class="page-head"><h1 class="display">'+esc(title)+'</h1>'+(text ? '<p>'+esc(text)+'</p>' : '')+'</div>'; }
 function roleList(){ return '<ul class="roles" aria-label="'+esc(t('roles_label'))+'">' + P.roles.map(function(r){ return '<li>'+esc(L(r))+'</li>'; }).join('') + '</ul>'; }
 function albumNameIn(albums, id){ var a = albums.filter(function(x){ return x.id === id; })[0]; return a ? L(a.name) : ''; }
 
@@ -420,7 +420,7 @@ function renderHome(){
   main.innerHTML = (H ? heroHTML(H) : '') + '<div id="start">' +
   '<div class="shell"><section class="home-hero" aria-label="'+esc(L(P.name))+'">' +
     '<div class="home-copy">' +
-      '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm"><span class="nm-main">'+esc(L(P.name))+'</span>'+(lang === 'zh' ? ' <span class="nm-en" lang="en">'+esc(NAME_EN)+'</span>' : '')+'</span></h1>' +
+      '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm"><span class="nm-main">'+esc(L(P.nameHome || P.name))+'</span>'+(lang === 'zh' ? ' <span class="nm-en" lang="en">'+esc(NAME_EN)+'</span>' : '')+'</span></h1>' +
       '<p class="big">'+esc(t('home_big'))+'</p>' + roleList() +
       '<div class="cta"><a class="btn solid" href="photography.html">'+esc(t('cta_photo'))+'</a><a class="btn line" href="about.html">'+esc(t('cta_about'))+'</a></div>' +
     '</div>' +
@@ -448,7 +448,7 @@ function renderHome(){
    Wide photos are shown at 3:2. A tall photo is exactly as high as two wide ones plus the gap between them, so rows line up. Columns all start at the same top edge, and each photo goes
    into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
-  main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) + (cfg.top || '') +
+  main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), cfg.p ? t(cfg.p) : '') + (cfg.top || '') +
     '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
   var featBox = $('.yt'); if(featBox) featBox.addEventListener('click', function(e){ var y = e.target.closest('.yt-play'); if(y) playYouTube(y.parentNode); });
   var grid = $('#grid'), items = [], nodes = [], laidW = 0;
@@ -503,7 +503,7 @@ function renderGallery(cfg){
   }
   onHash(draw); draw();
 }
-function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
+function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
 function featHTML(f){
   return '<div class="yt feat"><div class="yt-copy"><h2 class="feat-t">'+esc(L(f.title))+'</h2></div>' +
     '<div class="yt-frame" data-v="'+esc(f.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +

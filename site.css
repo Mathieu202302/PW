@@ -360,7 +360,7 @@ html[lang="zh-Hant-TW"] body{line-height:1.85}
 html[lang="zh-Hant-TW"] .display,html[lang="zh-Hant-TW"] .brand,html[lang="zh-Hant-TW"] .band h2,html[lang="zh-Hant-TW"] .sec h2,html[lang="zh-Hant-TW"] .coll-head h2{letter-spacing:0}
 html[lang="zh-Hant-TW"] h1,html[lang="zh-Hant-TW"] h2,html[lang="zh-Hant-TW"] h3{line-height:1.3}
 html[lang="zh-Hant-TW"] .page-head p,html[lang="zh-Hant-TW"] .coll-head p,html[lang="zh-Hant-TW"] .home-copy p+p,html[lang="zh-Hant-TW"] .about-text p,html[lang="zh-Hant-TW"] .tl-n{max-width:30em}
-html[lang="zh-Hant-TW"] .big{max-width:24em;line-height:1.7}
+html[lang="zh-Hant-TW"] .big{max-width:24em;line-height:1.7;white-space:pre-line}
 html[lang="zh-Hant-TW"] .about-text p:first-child{max-width:26em;line-height:1.75}
 html[lang="zh-Hant-TW"] .foot-sub{max-width:28em}
 html[lang="zh-Hant-TW"] .hello{letter-spacing:0;line-height:1.5}
