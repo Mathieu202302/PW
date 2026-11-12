@@ -60,7 +60,7 @@ h1:focus{outline:none}
 .progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--teal);transform-origin:0 50%;transform:scaleX(0)}
 @media (max-width:900px){
   .menu-btn{display:inline-block}
-  .nav{position:absolute;left:0;right:0;top:100%;margin:0;background:var(--paper);border-bottom:1px solid var(--rule);padding:8px 20px 16px;display:none;max-height:calc(100vh - 60px);overflow-y:auto}
+  .nav{position:absolute;left:0;right:0;top:100%;margin:0;background:var(--paper);border-bottom:1px solid var(--rule);padding:8px 20px calc(120px + env(safe-area-inset-bottom));display:none;max-height:calc(100vh - 60px);max-height:calc(100dvh - 60px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   .top.open .nav{display:block}
   .nav-list{flex-direction:column;align-items:stretch;gap:0}
   .nav-item{flex-wrap:wrap;border-top:1px solid var(--rule)}

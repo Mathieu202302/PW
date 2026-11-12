@@ -327,13 +327,13 @@ function renderHome(){
 
 /* ---- Photography and My life (same gallery, different data) ----
    Every preview in a gallery has the same width: 1 column on phones, 2 on tablets, 3 on desktop.
-   Wide photos are shown at 3:2 and tall photos at 1:2 (width:height). Columns all start at the same top edge, and each photo goes
+   Wide photos are shown at 3:2 and tall photos at 3:4 (width:height). Columns all start at the same top edge, and each photo goes
    into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
   main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), t(cfg.p)) +
     '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
   var grid = $('#grid'), items = [], nodes = [], laidW = 0;
-  function ratioOf(p){ return (!p.video && p.h > p.w) ? 1 / 2 : 3 / 2; }
+  function ratioOf(p){ return (!p.video && p.h > p.w) ? 3 / 4 : 3 / 2; }
   function layout(){
     var W = grid.clientWidth; if(!W || !nodes.length) return;
     laidW = W;
