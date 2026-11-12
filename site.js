@@ -1,15 +1,29 @@
-/* Shared behavior for every page: header, footer, gallery, lightbox and page content.
-   Content lives in data.js. */
+/* Shared behavior for every page: header, footer, gallery, lightbox, language switch and page content.
+   Page content lives in data.js. Interface text lives in i18n.js. */
 (function(){
 'use strict';
-var S = window.SITE, P = S.profile;
+var S = window.SITE, P = S.profile, I = window.I18N;
 var $ = function(s, r){ return (r||document).querySelector(s); };
 var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
 var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-var clamp = function(v,a,b){ return v<a?a:v>b?b:v; };
-var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 var page = document.body.getAttribute('data-page');
 var main = $('#main');
+
+/* ================= Language ================= */
+var lang = 'en';
+function detectLang(){
+  var q = ''; try{ q = new URLSearchParams(location.search).get('lang') || ''; }catch(e){}
+  if(q === 'en' || q === 'zh') return q;
+  try{ var s = localStorage.getItem('lang'); if(s === 'en' || s === 'zh') return s; }catch(e){}
+  var list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+  for(var i = 0; i < list.length; i++){ if(/^zh/i.test(list[i])) return 'zh'; if(/^en/i.test(list[i])) return 'en'; }
+  return 'en';
+}
+function L(v){ return (v && typeof v === 'object' && 'en' in v) ? (v[lang] || v.en) : v; }
+function t(key){
+  var v = I[lang][key]; if(v === undefined) v = I.en[key];
+  return typeof v === 'function' ? v.apply(null, Array.prototype.slice.call(arguments, 1)) : v;
+}
 
 /* ================= Placeholder art (used until a real src is set) ================= */
 function rng(seed){ var s = (seed || 1) >>> 0; return function(){ s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -94,48 +108,72 @@ function carSVG(seed, w, h, hue){
   });
   return svg + '</svg>';
 }
+function pawAt(cx, cy, s, fill, op, rot){
+  var g = '<g transform="rotate('+rot+' '+cx+' '+cy+')" fill="'+fill+'" fill-opacity="'+op+'">';
+  g += '<ellipse cx="'+cx+'" cy="'+(cy+s*.1)+'" rx="'+(s*.19)+'" ry="'+(s*.15)+'"/>';
+  g += '<circle cx="'+(cx-s*.13)+'" cy="'+(cy+s*.03)+'" r="'+(s*.075)+'"/><circle cx="'+(cx+s*.13)+'" cy="'+(cy+s*.03)+'" r="'+(s*.075)+'"/>';
+  [[-.27,-.1,-24],[-.1,-.26,-8],[.1,-.26,8],[.27,-.1,24]].forEach(function(t){
+    g += '<ellipse cx="'+(cx+s*t[0])+'" cy="'+(cy+s*t[1])+'" rx="'+(s*.075)+'" ry="'+(s*.105)+'" transform="rotate('+t[2]+' '+(cx+s*t[0])+' '+(cy+s*t[1])+')"/>';
+  });
+  return g + '</g>';
+}
+function pawSVG(seed, w, h, hue){
+  var r = rng(seed), s = Math.min(w, h), ink = 'hsl('+(hue+8)+',42%,24%)';
+  var svg = head(w, h, [[0,'hsl('+hue+',58%,88%)'],[1,'hsl('+(hue+22)+',50%,70%)']]);
+  svg += '<ellipse cx="'+(w/2)+'" cy="'+(h*.9)+'" rx="'+(w*.6)+'" ry="'+(h*.16)+'" fill="hsla('+hue+',40%,40%,.18)"/>';
+  svg += pawAt(w*(.3+r()*.1), h*(.74+r()*.04), s*.52, ink, .22, -18+r()*10);
+  svg += pawAt(w*(.58+r()*.1), h*(.5+r()*.05), s*.78, ink, .9, 10+r()*10);
+  return svg + '</svg>';
+}
 function artURI(a, w, h){
-  var f = a.kind === 'city' ? citySVG : a.kind === 'bricks' ? bricksSVG : a.kind === 'car' ? carSVG : a.kind === 'box' ? boxSVG : hillsSVG;
+  var f = a.kind === 'city' ? citySVG : a.kind === 'bricks' ? bricksSVG : a.kind === 'car' ? carSVG : a.kind === 'box' ? boxSVG : a.kind === 'paw' ? pawSVG : hillsSVG;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(f(a.seed, w, h, a.hue));
 }
 function dims(it){ return {w: it.w || 800, h: it.h || 1000}; }
 function srcOf(it){ var d = dims(it); return it.src || artURI(it.art, d.w, d.h); }
 
 /* ================= Header, navigation, footer ================= */
-var NAV = [
-  {key:'photography', label:'Photography', href:'photography.html',
-   sub:[{label:'All photos', href:'photography.html'}].concat(S.albums.map(function(a){ return {label:a.name, href:'photography.html#'+a.id}; }))},
-  {key:'collections', label:'Collections', href:'collections.html',
-   sub:[{label:'All collections', href:'collections.html'}].concat(S.collections.map(function(c){ return {label:c.name, href:'collections.html#'+c.id}; }))},
-  {key:'career', label:'Career', href:'career.html'},
-  {key:'about', label:'About me', href:'about.html'}
-];
 function renderHeader(){
-  var h = $('#top');
+  var h = $('#top'), isOpen = h.classList.contains('open');
+  var NAV = [
+    {key:'photography', label:t('photography'), href:'photography.html',
+     sub:[{label:t('all_photos'), href:'photography.html'}].concat(S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; }))},
+    {key:'collections', label:t('collections'), href:'collections.html',
+     sub:[{label:t('all_collections'), href:'collections.html'}].concat(S.collections.map(function(c){ return {label:L(c.name), href:'collections.html#'+c.id}; }))},
+    {key:'career', label:t('career'), href:'career.html'},
+    {key:'about', label:t('about'), href:'about.html'}
+  ];
   h.innerHTML =
-    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="218" alt=""><span>'+esc(P.name)+'</span></a>' +
-    '<button type="button" class="menu-btn" aria-expanded="false" aria-controls="nav">Menu</button>' +
-    '<nav class="nav" id="nav" aria-label="Main"><ul class="nav-list">' + NAV.map(function(n){
+    '<div class="top-in"><a class="brand" href="index.html"><img src="logo-small.png" width="420" height="218" alt=""><span>'+esc(L(P.name))+'</span></a>' +
+    '<button type="button" class="menu-btn" aria-expanded="'+isOpen+'" aria-controls="nav">'+esc(t('menu'))+'</button>' +
+    '<nav class="nav" id="nav" aria-label="'+esc(t('nav_main'))+'"><ul class="nav-list">' + NAV.map(function(n){
       var cur = n.key === page ? ' aria-current="page"' : '';
       if(!n.sub) return '<li class="nav-item"><a class="nav-link" href="'+n.href+'"'+cur+'>'+esc(n.label)+'</a></li>';
       return '<li class="nav-item has-sub"><a class="nav-link" href="'+n.href+'"'+cur+'>'+esc(n.label)+'</a>' +
-        '<button type="button" class="caret" aria-expanded="false" aria-haspopup="true" aria-label="Open the '+esc(n.label)+' menu"></button>' +
+        '<button type="button" class="caret" aria-expanded="false" aria-haspopup="true" aria-label="'+esc(t('open_menu', n.label))+'"></button>' +
         '<ul class="sub">' + n.sub.map(function(s){ return '<li><a href="'+s.href+'">'+esc(s.label)+'</a></li>'; }).join('') + '</ul></li>';
-    }).join('') + '</ul></nav></div><div class="progress" id="progress"></div>';
-
-  var menuBtn = $('.menu-btn', h);
-  menuBtn.addEventListener('click', function(){
-    var open = !h.classList.contains('open'); h.classList.toggle('open', open); menuBtn.setAttribute('aria-expanded', String(open));
-  });
-  function closeSubs(except){
-    $$('.has-sub.open', h).forEach(function(li){ if(li !== except){ li.classList.remove('open'); $('.caret', li).setAttribute('aria-expanded','false'); } });
-  }
-  $$('.caret', h).forEach(function(c){
-    c.addEventListener('click', function(e){
-      e.stopPropagation();
-      var li = c.parentNode, open = !li.classList.contains('open');
-      closeSubs(li); li.classList.toggle('open', open); c.setAttribute('aria-expanded', String(open));
-    });
+    }).join('') + '</ul>' +
+    '<div class="lang" role="group" aria-label="'+esc(t('lang_group'))+'">' +
+      '<button type="button" lang="en" data-lang="en" aria-pressed="'+(lang === 'en')+'" aria-label="English">EN</button>' +
+      '<button type="button" lang="zh-Hant-TW" data-lang="zh" aria-pressed="'+(lang === 'zh')+'" aria-label="繁體中文">中文</button>' +
+    '</div></nav></div><div class="progress" id="progress"></div>';
+  updateProgress();
+}
+function closeSubs(except){
+  $$('#top .has-sub.open').forEach(function(li){ if(li !== except){ li.classList.remove('open'); $('.caret', li).setAttribute('aria-expanded','false'); } });
+}
+function updateProgress(){
+  var bar = $('#progress'); if(!bar) return;
+  var d = document.documentElement.scrollHeight - innerHeight;
+  bar.style.transform = 'scaleX(' + (d > 0 ? Math.min(1, scrollY / d) : 0) + ')';
+}
+function bindHeaderOnce(){
+  var h = $('#top');
+  h.addEventListener('click', function(e){
+    var m = e.target.closest('.menu-btn'), c = e.target.closest('.caret'), g = e.target.closest('[data-lang]');
+    if(m){ var open = !h.classList.contains('open'); h.classList.toggle('open', open); m.setAttribute('aria-expanded', String(open)); }
+    else if(c){ e.stopPropagation(); var li = c.parentNode, o = !li.classList.contains('open'); closeSubs(li); li.classList.toggle('open', o); c.setAttribute('aria-expanded', String(o)); }
+    else if(g){ setLang(g.getAttribute('data-lang')); }
   });
   document.addEventListener('click', function(e){ if(!e.target.closest('.has-sub')) closeSubs(null); });
   document.addEventListener('keydown', function(e){
@@ -144,31 +182,28 @@ function renderHeader(){
       if(document.activeElement && document.activeElement.closest && document.activeElement.closest('.sub')) document.activeElement.blur();
     }
   });
-
-  var bar = $('#progress'), tick = false;
-  function upd(){
-    var d = document.documentElement.scrollHeight - innerHeight;
-    bar.style.transform = 'scaleX(' + (d > 0 ? Math.min(1, scrollY / d) : 0) + ')'; tick = false;
-  }
-  addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(upd); } }, {passive:true});
+  var tick = false;
+  addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(function(){ updateProgress(); tick = false; }); } }, {passive:true});
 }
 function renderFooter(){
   $('#foot').innerHTML =
-    '<div class="shell foot-in"><div class="foot-id"><img class="foot-logo" src="footer-logo.png" width="560" height="560" alt="" aria-hidden="true"><div><p class="foot-h display">Say hello</p><p class="foot-sub">Send me a message and I will get back to you.</p></div></div>' +
-    '<div class="foot-actions"><a class="btn solid" href="contact.html">Contact me</a><ul class="links">' +
+    '<div class="shell foot-in"><div class="foot-id"><img class="foot-logo" src="footer-logo.png" width="560" height="560" alt="" aria-hidden="true">' +
+    '<div class="foot-txt"><p class="foot-h display">'+esc(t('foot_h'))+'</p><p class="foot-sub">'+esc(t('foot_sub'))+'</p>' +
+    '<a class="btn solid foot-cta" href="contact.html">'+esc(t('contact_btn'))+'</a></div></div>' +
+    '<ul class="links">' +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
-    '</ul></div></div><p class="shell copy">© 2026 '+esc(P.name)+'</p>';
+    '</ul></div><p class="shell copy">© 2026 '+esc(L(P.name))+'</p>';
 }
 
 /* ================= Lightbox ================= */
 var lb = null, lbState = {list:[], i:0, opener:null};
 function buildLB(){
   var el = document.createElement('div');
-  el.className = 'lb'; el.hidden = true; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','Image viewer');
+  el.className = 'lb'; el.hidden = true; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label', t('lb_viewer'));
   el.innerHTML =
-    '<div class="lb-top"><output aria-live="polite"></output><button type="button" class="lb-btn" data-a="close">Close</button></div>' +
-    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="Previous image">&#8249;</button><img alt=""><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="Next image">&#8250;</button></div>' +
-    '<div class="lb-cap"></div><div class="lb-strip" role="group" aria-label="All images"></div>';
+    '<div class="lb-top"><output aria-live="polite"></output><button type="button" class="lb-btn" data-a="close">'+esc(t('close'))+'</button></div>' +
+    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="'+esc(t('prev'))+'">&#8249;</button><img alt=""><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="'+esc(t('next'))+'">&#8250;</button></div>' +
+    '<div class="lb-cap"></div><div class="lb-strip" role="group" aria-label="'+esc(t('all_images'))+'"></div>';
   document.body.appendChild(el);
   lb = {el:el, img:$('img', el), out:$('output', el), cap:$('.lb-cap', el), strip:$('.lb-strip', el), stage:$('.lb-stage', el)};
   el.addEventListener('click', function(e){
@@ -183,21 +218,21 @@ function buildLB(){
     if(sx === null) return; var dx = e.clientX - sx; sx = null;
     if(Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
   });
-  document.addEventListener('keydown', function(e){
-    if(el.hidden) return;
-    if(e.key === 'Escape'){ closeLB(); }
-    else if(e.key === 'ArrowRight'){ step(1); }
-    else if(e.key === 'ArrowLeft'){ step(-1); }
-    else if(e.key === 'Home'){ lbState.i = 0; showLB(); }
-    else if(e.key === 'End'){ lbState.i = lbState.list.length - 1; showLB(); }
-    else if(e.key === 'Tab'){
-      var f = $$('button', el); if(!f.length) return;
-      var first = f[0], last = f[f.length-1];
-      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-    }
-  });
 }
+document.addEventListener('keydown', function(e){
+  if(!lb || lb.el.hidden) return;
+  if(e.key === 'Escape'){ closeLB(); }
+  else if(e.key === 'ArrowRight'){ step(1); }
+  else if(e.key === 'ArrowLeft'){ step(-1); }
+  else if(e.key === 'Home'){ lbState.i = 0; showLB(); }
+  else if(e.key === 'End'){ lbState.i = lbState.list.length - 1; showLB(); }
+  else if(e.key === 'Tab'){
+    var f = $$('button', lb.el); if(!f.length) return;
+    var first = f[0], last = f[f.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+});
 function step(d){ var n = lbState.list.length; lbState.i = (lbState.i + d + n) % n; showLB(); }
 function showLB(){
   var it = lbState.list[lbState.i];
@@ -213,165 +248,262 @@ function openLB(list, i, opener){
   if(!lb) buildLB();
   lbState = {list:list, i:i, opener:opener};
   lb.strip.innerHTML = list.map(function(it, k){
-    return '<button type="button" data-j="'+k+'" aria-label="Show '+esc(it.title)+'" aria-current="false"><img src="'+it.src+'" alt=""></button>';
+    return '<button type="button" data-j="'+k+'" aria-label="'+esc(t('show', it.title))+'" aria-current="false"><img src="'+it.src+'" alt=""></button>';
   }).join('');
   lb.el.hidden = false; document.body.style.overflow = 'hidden';
   showLB(); $('[data-a="close"]', lb.el).focus();
 }
 function closeLB(){
   lb.el.hidden = true; document.body.style.overflow = '';
-  if(lbState.opener && lbState.opener.focus) lbState.opener.focus({preventScroll:true});
+  if(lbState.opener && lbState.opener.focus && document.contains(lbState.opener)) lbState.opener.focus({preventScroll:true});
 }
+function resetLB(){ if(lb){ lb.el.remove(); lb = null; document.body.style.overflow = ''; } }
 
 /* ================= Pages ================= */
-function pageHead(title, text){
-  return '<div class="page-head"><h1 class="display">'+esc(title)+'</h1><p>'+esc(text)+'</p></div>';
-}
-function albumName(id){ var a = S.albums.filter(function(x){ return x.id === id; })[0]; return a ? a.name : ''; }
+var hashFn = null, clockT = null;
+function onHash(fn){ if(hashFn) removeEventListener('hashchange', hashFn); hashFn = fn; if(fn) addEventListener('hashchange', fn); }
+function pageHead(title, text){ return '<div class="page-head"><h1 class="display">'+esc(title)+'</h1><p>'+esc(text)+'</p></div>'; }
+function roleList(){ return '<ul class="roles" aria-label="'+esc(t('roles_label'))+'">' + P.roles.map(function(r){ return '<li>'+esc(L(r))+'</li>'; }).join('') + '</ul>'; }
+function albumName(id){ var a = S.albums.filter(function(x){ return x.id === id; })[0]; return a ? L(a.name) : ''; }
 
 /* ---- Home ---- */
 function renderHome(){
   var photo = S.photos[0], coll = S.collections[0];
   main.innerHTML =
-  '<div class="shell"><section class="home-hero" aria-label="Introduction">' +
+  '<div class="shell"><section class="home-hero" aria-label="'+esc(L(P.name))+'">' +
     '<div class="home-copy">' +
-      '<h1 class="display">'+esc(P.name)+'</h1>' +
-      '<p class="big">I grew up in Tainan, Taiwan, and now live in San Diego, where I\'m earning a master\'s in electrical and computer engineering. I take photographs and collect LEGO and model cars.</p>' +
-      '<ul class="roles" aria-label="About me in three words">' + P.roles.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('') + '</ul>' +
-      '<div class="cta"><a class="btn solid" href="photography.html">See my photography</a><a class="btn line" href="about.html">About me</a></div>' +
+      '<h1 class="display"><span class="hello">'+esc(t('hello'))+'</span> <span class="nm">'+esc(L(P.name))+'</span></h1>' +
+      '<p class="big">'+esc(t('home_big'))+'</p>' + roleList() +
+      '<div class="cta"><a class="btn solid" href="photography.html">'+esc(t('cta_photo'))+'</a><a class="btn line" href="about.html">'+esc(t('cta_about'))+'</a></div>' +
     '</div>' +
-    '<figure class="film"><img src="matthew-portrait.jpg" width="1200" height="1500" alt="Matthew Wang leaning on a railing in sunglasses and a white shirt, with hills and the Hollywood sign behind him">' +
-      '<div class="ann tl">'+esc(P.name)+'\n'+esc(P.short)+'</div><div class="ann tr" id="clock"></div>' +
-      '<div class="ann bl">M.S. ECE\nMedical imaging</div><div class="ann br">Class of 2027</div></figure>' +
+    '<figure class="film"><img src="matthew-portrait.jpg" width="1200" height="1500" alt="'+esc(t('portrait_alt'))+'">' +
+      '<div class="ann tl">'+esc(L(P.name))+'\n'+esc(L(P.short))+'</div><div class="ann tr" id="clock"></div>' +
+      '<div class="ann bl">'+esc(t('ann_bl'))+'</div><div class="ann br">'+esc(t('ann_br'))+'</div></figure>' +
   '</section></div>' +
-  '<section class="band"><div class="shell band-in"><h2>Explore</h2><div class="explore">' +
-    '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo)+'" alt=""><h3>Photography</h3><p>Albums from my camera.</p></a>' +
-    '<a class="ex coll" href="collections.html"><img src="'+(coll.items[0].src || artURI(coll.items[0].art, 1200, 640))+'" alt=""><h3>Collections</h3><p>LEGO and model cars.</p></a>' +
-    '<a class="ex career" href="career.html"><div class="ann">Education\nM.S., ECE\n2025 to 2027</div><div><h3>Career</h3><p>Where I studied.</p></div></a>' +
-    '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>About me</h3><p>A bit more about me.</p></a>' +
+  '<section class="band"><div class="shell band-in"><h2>'+esc(t('explore'))+'</h2><div class="explore">' +
+    '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo)+'" alt=""><h3>'+esc(t('photography'))+'</h3><p>'+esc(t('ex_photo_p'))+'</p></a>' +
+    '<a class="ex coll" href="collections.html"><img src="'+(coll.items[0].src || artURI(coll.items[0].art, 1200, 640))+'" alt=""><h3>'+esc(t('collections'))+'</h3><p>'+esc(t('ex_coll_p'))+'</p></a>' +
+    '<a class="ex career" href="career.html"><div class="ann">'+esc(t('ann_career'))+'</div><div><h3>'+esc(t('career'))+'</h3><p>'+esc(t('ex_career_p'))+'</p></div></a>' +
+    '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>'+esc(t('about'))+'</h3><p>'+esc(t('ex_about_p'))+'</p></a>' +
   '</div></div></section>';
   function clock(){
-    var t = new Intl.DateTimeFormat('en-US', {hour:'numeric', minute:'2-digit', timeZone:P.tz}).format(new Date());
-    $('#clock').textContent = 'Local time\n' + t;
+    var el = $('#clock'); if(!el) return;
+    var s = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-TW' : 'en-US', {hour:'numeric', minute:'2-digit', timeZone:P.tz}).format(new Date());
+    el.textContent = t('ann_local') + '\n' + s;
   }
-  clock(); setInterval(clock, 20000);
+  clock(); clearInterval(clockT); clockT = setInterval(clock, 20000);
 }
 
 /* ---- Photography ---- */
 function renderPhotography(){
-  main.innerHTML = '<div class="shell">' + pageHead('Photography', 'Frames from my camera, grouped by album.') +
-    '<nav class="chips" id="chips" aria-label="Albums"></nav><p class="count" id="count" aria-live="polite"></p><div class="masonry" id="grid"></div></div>';
+  main.innerHTML = '<div class="shell">' + pageHead(t('photo_h'), t('photo_p')) +
+    '<nav class="chips" id="chips" aria-label="'+esc(t('albums_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="masonry" id="grid"></div></div>';
   var list = [];
   function draw(){
     var h = location.hash.slice(1) || 'all';
     if(h !== 'all' && !S.albums.some(function(a){ return a.id === h; })) h = 'all';
-    $('#chips').innerHTML = [{id:'all', name:'All'}].concat(S.albums).map(function(a){
-      return '<a class="chip" href="#'+a.id+'" aria-current="'+(a.id === h)+'">'+esc(a.name)+'</a>';
+    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(S.albums).map(function(a){
+      return '<a class="chip" href="#'+a.id+'" aria-current="'+(a.id === h)+'">'+esc(L(a.name))+'</a>';
     }).join('');
     list = S.photos.filter(function(p){ return h === 'all' || p.album === h; });
-    $('#count').textContent = list.length + (list.length === 1 ? ' photo' : ' photos') + (h === 'all' ? '' : ' in ' + albumName(h));
+    $('#count').textContent = h === 'all' ? t('photo_count', list.length) : t('photo_count_in', list.length, albumName(h));
     $('#grid').innerHTML = list.map(function(p, i){
-      return '<button type="button" class="tile" data-i="'+i+'" style="aspect-ratio:'+p.w+'/'+p.h+'" aria-label="Open photo: '+esc(p.title)+'">' +
-        '<img src="'+srcOf(p)+'" width="'+p.w+'" height="'+p.h+'" alt="'+esc(p.title)+'" loading="lazy">' +
-        '<span class="cap"><b>'+esc(p.title)+'</b><span>'+esc(albumName(p.album))+'</span></span>' + (p.src ? '' : '<span class="ph">Placeholder</span>') + '</button>';
+      return '<button type="button" class="tile" data-i="'+i+'" style="aspect-ratio:'+p.w+'/'+p.h+'" aria-label="'+esc(t('open_photo', L(p.title)))+'">' +
+        '<img src="'+srcOf(p)+'" width="'+p.w+'" height="'+p.h+'" alt="'+esc(L(p.title))+'" loading="lazy">' +
+        '<span class="cap"><b>'+esc(L(p.title))+'</b><span>'+esc(albumName(p.album))+'</span></span>' + (p.src ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
     }).join('');
   }
   $('#grid').addEventListener('click', function(e){
-    var t = e.target.closest('.tile'); if(!t) return;
-    openLB(list.map(function(p){ return {src:srcOf(p), title:p.title, meta:albumName(p.album) + (p.src ? '' : ', placeholder')}; }), parseInt(t.getAttribute('data-i'), 10), t);
+    var tile = e.target.closest('.tile'); if(!tile) return;
+    openLB(list.map(function(p){ return {src:srcOf(p), title:L(p.title), meta:albumName(p.album) + (p.src ? '' : t('placeholder_meta'))}; }), parseInt(tile.getAttribute('data-i'), 10), tile);
   });
-  addEventListener('hashchange', draw); draw();
+  onHash(draw); draw();
 }
 
 /* ---- Collections ---- */
+function youtubeHTML(){
+  var y = S.youtube; if(!y || !y.id) return '<div style="height:48px"></div>';
+  return '<section class="yt" id="youtube" aria-labelledby="yt-h"><div class="yt-copy"><h2 id="yt-h">'+esc(t('yt_h'))+'</h2><p>'+esc(t('yt_p'))+'</p>' +
+    '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>' +
+    '<div class="yt-frame" id="ytFrame"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
+      '<img src="https://i.ytimg.com/vi/'+esc(y.id)+'/hqdefault.jpg" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></section>';
+}
+function bindYouTube(){
+  var box = $('#ytFrame'); if(!box || !S.youtube) return;
+  var img = $('img', box); if(img) img.addEventListener('error', function(){ img.remove(); });
+  box.addEventListener('click', function(e){
+    if(!e.target.closest('.yt-play')) return;
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(S.youtube.id) + '?autoplay=1&rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en');
+    f.title = t('yt_frame'); f.allowFullscreen = true;
+    f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    box.innerHTML = ''; box.appendChild(f); f.focus();
+  });
+}
 function renderCollections(){
-  main.innerHTML = '<div class="shell">' + pageHead('Collections', 'Things I collect, shown the way I keep them.') +
-    '<nav class="chips" id="chips" aria-label="Collections"></nav><p class="count" id="count" aria-live="polite"></p><div id="colls"></div><div style="height:48px"></div></div>';
+  main.innerHTML = '<div class="shell">' + pageHead(t('coll_h'), t('coll_p')) +
+    '<nav class="chips" id="chips" aria-label="'+esc(t('colls_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div id="colls"></div>' + youtubeHTML() + '</div>';
   var lists = {};
   function draw(){
     var h = location.hash.slice(1) || 'all';
     if(h !== 'all' && !S.collections.some(function(c){ return c.id === h; })) h = 'all';
-    $('#chips').innerHTML = [{id:'all', name:'All'}].concat(S.collections).map(function(c){
-      return '<a class="chip" href="#'+c.id+'" aria-current="'+(c.id === h)+'">'+esc(c.name)+'</a>';
+    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(S.collections).map(function(c){
+      return '<a class="chip" href="#'+c.id+'" aria-current="'+(c.id === h)+'">'+esc(L(c.name))+'</a>';
     }).join('');
     var shown = S.collections.filter(function(c){ return h === 'all' || c.id === h; });
-    var n = shown.reduce(function(t, c){ return t + c.items.length; }, 0);
-    $('#count').textContent = shown.length + (shown.length === 1 ? ' collection' : ' collections') + ', ' + n + ' items';
+    var n = shown.reduce(function(sum, c){ return sum + c.items.length; }, 0);
+    $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
-      lists[c.id] = c.items.map(function(it){ return {src:srcOf(it), title:it.title, meta:c.name + ', ' + it.meta}; });
-      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(c.name)+'</h2><p>'+esc(c.blurb)+'</p></div><div class="grid">' +
+      lists[c.id] = c.items.map(function(it){ return {src:srcOf(it), title:L(it.title), meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
+      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div><div class="grid">' +
         c.items.map(function(it, i){
-          return '<button type="button" class="tile" data-c="'+c.id+'" data-i="'+i+'" aria-label="Open item: '+esc(it.title)+'">' +
-            '<img src="'+srcOf(it)+'" alt="'+esc(it.title)+'" loading="lazy">' +
-            '<span class="cap"><b>'+esc(it.title)+'</b><span>'+esc(it.meta)+'</span></span>' + (it.src ? '' : '<span class="ph">Placeholder</span>') + '</button>';
+          return '<button type="button" class="tile" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
+            '<img src="'+srcOf(it)+'" alt="'+esc(L(it.title))+'" loading="lazy">' +
+            '<span class="cap"><b>'+esc(L(it.title))+'</b><span>'+esc(L(it.meta))+'</span></span>' + (it.src ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
         }).join('') + '</div></section>';
     }).join('');
   }
   $('#colls').addEventListener('click', function(e){
-    var t = e.target.closest('.tile'); if(!t) return;
-    openLB(lists[t.getAttribute('data-c')], parseInt(t.getAttribute('data-i'), 10), t);
+    var tile = e.target.closest('.tile'); if(!tile) return;
+    openLB(lists[tile.getAttribute('data-c')], parseInt(tile.getAttribute('data-i'), 10), tile);
   });
-  addEventListener('hashchange', draw); draw();
+  bindYouTube();
+  onHash(draw); draw();
 }
 
 /* ---- Career ---- */
 function renderCareer(){
-  main.innerHTML = '<div class="shell">' + pageHead('Career', 'Where I studied.') + '</div>' +
-  '<section class="sec"><div class="shell sec-in"><div><h2>Education</h2></div><div><ul class="tl">' + S.education.map(function(x){
-    var name = x.href ? '<a href="'+esc(x.href)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a>' : esc(x.title);
-    return '<li><span class="tl-when">'+esc(x.when)+'</span><div><div class="tl-t">'+name+'</div>' +
-      (x.sub ? '<p class="tl-s">'+esc(x.sub)+'</p>' : '') + (x.note ? '<p class="tl-n">'+esc(x.note)+'</p>' : '') + '</div></li>';
+  main.innerHTML = '<div class="shell">' + pageHead(t('career_h'), t('career_p')) + '</div>' +
+  '<section class="sec"><div class="shell sec-in"><div><h2>'+esc(t('edu_h'))+'</h2></div><div><ul class="tl">' + S.education.map(function(x){
+    var name = x.href ? '<a href="'+esc(x.href)+'" target="_blank" rel="noopener noreferrer">'+esc(L(x.title))+'</a>' : esc(L(x.title));
+    var sub = L(x.sub), note = L(x.note);
+    return '<li><span class="tl-when">'+esc(L(x.when))+'</span><div><div class="tl-t">'+name+'</div>' +
+      (sub ? '<p class="tl-s">'+esc(sub)+'</p>' : '') + (note ? '<p class="tl-n">'+esc(note)+'</p>' : '') + '</div></li>';
   }).join('') + '</ul></div></div></section>';
+  onHash(null);
 }
 
 /* ---- About ---- */
 function renderAbout(){
-  main.innerHTML = '<div class="shell">' + pageHead('About me', 'A little about who I am and what this site is for.') +
-  '<figure class="wide"><img src="matthew-wide.jpg" width="1920" height="1080" alt="Matthew Wang leaning on a railing in sunglasses, with hills and the Hollywood sign behind him"></figure>' +
-  '<div class="about-grid"><div><h2 class="display" style="font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1">Hi, I\'m Matthew.</h2></div><div class="about-text">' +
-    '<p>I\'m Matthew Wang. I grew up in Tainan, Taiwan, and now live in San Diego, where I\'m doing my master\'s degree in electrical and computer engineering at UC San Diego. I expect to graduate in 2027.</p>' +
-    '<p>I like photography, and I collect LEGO and model cars. I also collect some Disney Lorcana cards.</p>' +
-    '<ul class="roles" aria-label="About me in three words">' + P.roles.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('') + '</ul>' +
-    '<p>This site is a work in progress. Pages will fill in as I add more photos and more of my collections.</p>' +
-    '<dl class="facts"><div><dt>Grew up in</dt><dd>Tainan, Taiwan</dd></div><div><dt>Lives in</dt><dd>'+esc(P.location)+'</dd></div>' +
-    '<div><dt>Studying</dt><dd>M.S., electrical and computer engineering</dd></div><div><dt>Graduating</dt><dd>2027</dd></div>' +
-    '<div><dt>Into</dt><dd>Photography, LEGO, model cars, Lorcana cards</dd></div></dl>' +
-    '<div class="about-links"><a class="btn solid" href="photography.html">See my photography</a><a class="btn line" href="collections.html">See my collections</a></div>' +
+  main.innerHTML = '<div class="shell">' + pageHead(t('about_h'), t('about_p')) +
+  '<figure class="wide"><img src="matthew-wide.jpg" width="1920" height="1080" alt="'+esc(t('wide_alt'))+'"></figure>' +
+  '<div class="about-grid"><div><h2 class="display" style="font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1">'+esc(t('about_hi'))+'</h2></div><div class="about-text">' +
+    '<p>'+esc(t('about_p1'))+'</p><p>'+esc(t('about_p2'))+'</p>' + roleList() + '<p>'+esc(t('about_p3'))+'</p>' +
+    '<dl class="facts"><div><dt>'+esc(t('f_grew'))+'</dt><dd>'+esc(t('v_grew'))+'</dd></div><div><dt>'+esc(t('f_lives'))+'</dt><dd>'+esc(L(P.location))+'</dd></div>' +
+    '<div><dt>'+esc(t('f_study'))+'</dt><dd>'+esc(t('v_study'))+'</dd></div><div><dt>'+esc(t('f_grad'))+'</dt><dd>'+esc(t('v_grad'))+'</dd></div>' +
+    '<div><dt>'+esc(t('f_into'))+'</dt><dd>'+esc(t('v_into'))+'</dd></div></dl>' +
+    '<div class="about-links"><a class="btn solid" href="photography.html">'+esc(t('about_btn1'))+'</a><a class="btn line" href="collections.html">'+esc(t('about_btn2'))+'</a></div>' +
   '</div></div></div>';
+  onHash(null);
 }
 
 /* ---- Contact ---- */
 function renderContact(){
-  main.innerHTML = '<div class="shell">' + pageHead('Send me a message', 'Write your message below and press Send. It goes straight to my inbox.') +
+  main.innerHTML = '<div class="shell">' + pageHead(t('contact_h'), t('contact_p')) +
     '<form class="msg" id="msgForm" novalidate>' +
-      '<label for="msgText">Message</label>' +
+      '<label for="msgText">'+esc(t('msg_label'))+'</label>' +
       '<textarea id="msgText" name="message" rows="9" maxlength="3000" required></textarea>' +
       '<input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">' +
-      '<div class="msg-row"><button type="submit" class="btn solid" id="msgSend">Send</button><p class="msg-status" id="msgStatus" role="status" aria-live="polite"></p></div>' +
+      '<div class="msg-row"><button type="submit" class="btn solid" id="msgSend">'+esc(t('send'))+'</button><p class="msg-status" id="msgStatus" role="status" aria-live="polite"></p></div>' +
     '</form></div>';
   var form = $('#msgForm'), box = $('#msgText'), btn = $('#msgSend'), status = $('#msgStatus');
-  function say(t, kind){ status.textContent = t; status.setAttribute('data-kind', kind || ''); }
+  function say(text, kind){ status.textContent = text; status.setAttribute('data-kind', kind || ''); }
   form.addEventListener('submit', function(e){
     e.preventDefault();
     var text = box.value.trim();
-    if(!text){ say('Write a message first.', 'err'); box.focus(); return; }
+    if(!text){ say(t('st_empty'), 'err'); box.focus(); return; }
     if(form.botcheck.checked){ return; }
     var key = (S.contact && S.contact.accessKey) || '';
-    if(!key){ say('The message form is not connected yet. Please try again later.', 'err'); return; }
-    btn.disabled = true; say('Sending...', '');
+    if(!key){ say(t('st_noconf'), 'err'); return; }
+    btn.disabled = true; say(t('st_sending'), '');
     fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
       body: JSON.stringify({access_key: key, subject: 'New message from my website', from_name: 'Website contact form', message: text})
-    }).then(function(r){ return r.json().then(function(j){ return {ok: r.ok && j.success !== false, j: j}; }); })
+    }).then(function(r){ return r.json().then(function(j){ return {ok: r.ok && j.success !== false}; }); })
     .then(function(res){
-      if(res.ok){ box.value = ''; say('Sent. Thank you, I will get back to you soon.', 'ok'); }
-      else { say('Your message did not send. Please try again in a moment.', 'err'); }
-    }).catch(function(){ say('Your message did not send. Check your connection and try again.', 'err'); })
+      if(res.ok){ box.value = ''; say(t('st_ok'), 'ok'); }
+      else { say(t('st_fail'), 'err'); }
+    }).catch(function(){ say(t('st_net'), 'err'); })
     .then(function(){ btn.disabled = false; });
   });
+  onHash(null);
 }
 
-renderHeader(); renderFooter();
-({home:renderHome, photography:renderPhotography, collections:renderCollections, career:renderCareer, about:renderAbout, contact:renderContact})[page]();
+/* ================= Render everything, and switch language ================= */
+var pages = {home:renderHome, photography:renderPhotography, collections:renderCollections, career:renderCareer, about:renderAbout, contact:renderContact};
+function renderAll(){
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hant-TW' : 'en';
+  document.title = t('title_' + page);
+  var md = $('meta[name="description"]'); if(md) md.setAttribute('content', t('meta_desc'));
+  var skip = $('.skip'); if(skip) skip.textContent = t('skip');
+  renderHeader(); renderFooter(); pages[page]();
+}
+function setLang(next){
+  if(next === lang) return;
+  var draft = $('#msgText') ? $('#msgText').value : '';
+  resetLB(); lang = next;
+  try{ localStorage.setItem('lang', next); }catch(e){}
+  renderAll();
+  if(draft && $('#msgText')) $('#msgText').value = draft;
+}
+
+
+/* ================= Pull down to refresh (installed web app only) =================
+   Browsers already refresh on pull-down. An app added to the home screen does not on iPhone, so this adds it there. */
+function initPTR(){
+  var standalone = false;
+  try{ standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches; }catch(e){}
+  if(!standalone) return;
+  document.documentElement.classList.add('standalone');
+  var el = document.createElement('div');
+  el.className = 'ptr'; el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite');
+  el.innerHTML = '<span class="ptr-arrow" aria-hidden="true"></span><span class="ptr-txt"></span>';
+  document.body.appendChild(el);
+  var txt = $('.ptr-txt', el), startY = null, startX = 0, dist = 0, pulling = false, busy = false, LIMIT = 150, TRIGGER = 80;
+  function paint(d, state){
+    el.style.setProperty('--pull', d + 'px');
+    el.setAttribute('data-state', state);
+    txt.textContent = state === 'loading' ? t('ptr_loading') : state === 'ready' ? t('ptr_release') : t('ptr_pull');
+  }
+  function reset(){ pulling = false; startY = null; dist = 0; el.classList.remove('on'); el.style.setProperty('--pull', '0px'); el.setAttribute('data-state', ''); txt.textContent = ''; }
+  function blocked(target){
+    if(busy || (lb && !lb.el.hidden)) return true;
+    if(target && target.closest && target.closest('textarea, input, iframe, .lb')) return true;
+    var draft = $('#msgText'); if(draft && draft.value.trim()) return true;
+    return false;
+  }
+  document.addEventListener('touchstart', function(e){
+    if(e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)){ startY = null; return; }
+    startY = e.touches[0].clientY; startX = e.touches[0].clientX; dist = 0; pulling = false;
+  }, {passive:true});
+  document.addEventListener('touchmove', function(e){
+    if(startY === null) return;
+    if(window.scrollY > 0){ reset(); return; }
+    var dy = e.touches[0].clientY - startY, dx = Math.abs(e.touches[0].clientX - startX);
+    if(!pulling){
+      if(dy <= 8) return;
+      if(dx > dy){ startY = null; return; }
+      pulling = true; el.classList.add('on');
+    }
+    if(e.cancelable) e.preventDefault();
+    dist = Math.min(LIMIT, dy * .5);
+    paint(dist, dist >= TRIGGER ? 'ready' : 'pull');
+  }, {passive:false});
+  function end(){
+    if(!pulling){ startY = null; return; }
+    if(dist >= TRIGGER){
+      busy = true; paint(TRIGGER, 'loading');
+      setTimeout(function(){ location.reload(); }, 350);
+    } else { reset(); }
+  }
+  document.addEventListener('touchend', end, {passive:true});
+  document.addEventListener('touchcancel', function(){ if(!busy) reset(); }, {passive:true});
+}
+
+lang = detectLang();
+bindHeaderOnce();
+renderAll();
+initPTR();
 })();
