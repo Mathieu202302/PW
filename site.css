@@ -38,7 +38,7 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-padding-top:84px}
+html{scroll-padding-top:84px;background:var(--paper)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
 h1,h2,h3,p,dl,dd,ul,figure{margin:0}
 a{color:inherit}
@@ -313,6 +313,7 @@ h1:focus{outline:none}
 .theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--rule);border-radius:999px;background:transparent;color:var(--graphite);cursor:pointer}
 .theme-btn:hover{color:var(--ink);border-color:var(--ink)}
 .theme-btn svg{display:block;width:18px;height:18px}
+:root[data-app] .theme-btn{display:none}
 .theme-btn .i-sun{display:none}
 :root[data-theme="dark"] .theme-btn .i-sun{display:block}
 :root[data-theme="dark"] .theme-btn .i-moon{display:none}

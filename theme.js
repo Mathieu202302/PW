@@ -1,22 +1,34 @@
 /* Light / dark theme. Follows the device setting until the visitor uses the switch; a choice made with the
    switch is kept for the current visit only (like the language), so the next visit starts from the device again.
-   Loaded in <head> so the right colours are on screen from the first paint. */
+   Loaded in <head> so the right colours are on screen from the first paint.
+   In the installed app (home-screen icon) the theme always follows the device: iOS draws the status bar at the top
+   (clock, battery, camera cut-out) from the device setting and cannot follow a manual choice, so the switch is
+   hidden there and the whole app, status bar included, stays in one theme. */
 (function(){
   var root = document.documentElement, KEY = 'theme', COLORS = {light:'#E9EDEC', dark:'#0E1315'}, subs = [];
   var mq = null; try{ mq = window.matchMedia('(prefers-color-scheme: dark)'); }catch(e){}
-  function stored(){ try{ var s = sessionStorage.getItem(KEY); return (s === 'dark' || s === 'light') ? s : null; }catch(e){ return null; } }
+  var app = false;
+  try{ app = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches; }catch(e){}
+  if(app) root.setAttribute('data-app', '');
+  function stored(){ if(app) return null; try{ var s = sessionStorage.getItem(KEY); return (s === 'dark' || s === 'light') ? s : null; }catch(e){ return null; } }
   function system(){ return (mq && mq.matches) ? 'dark' : 'light'; }
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if(!meta){ meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
+  /* The page carries one theme-color tag per device setting (in the HTML, so it is there at launch). A manual
+     choice points both at the chosen colour; otherwise each keeps its own. */
+  var metas = [].slice.call(document.querySelectorAll('meta[name="theme-color"]'));
+  if(!metas.length){ var m0 = document.createElement('meta'); m0.name = 'theme-color'; document.head.appendChild(m0); metas = [m0]; }
   function apply(){
-    var m = stored() || system();
+    var o = stored(), m = o || system();
     root.setAttribute('data-theme', m);
-    meta.setAttribute('content', COLORS[m]);
+    metas.forEach(function(el){
+      var med = el.getAttribute('media') || '';
+      el.setAttribute('content', o ? COLORS[o] : (/dark/.test(med) ? COLORS.dark : /light/.test(med) ? COLORS.light : COLORS[m]));
+    });
     subs.forEach(function(f){ try{ f(m); }catch(e){} });
   }
   window.THEME = {
     get: function(){ return root.getAttribute('data-theme') || system(); },
     toggle: function(){
+      if(app) return;
       var next = this.get() === 'dark' ? 'light' : 'dark';
       try{ sessionStorage.setItem(KEY, next); }catch(e){}
       apply();
