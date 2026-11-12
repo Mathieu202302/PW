@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.5937.271.40', date: '2026-11-12'},
+  version: {number: '1.6482.309.57', date: '2026-11-12'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -32,7 +32,7 @@ window.SITE = {
 
   /* Google Drive sync. url is the web address of the Apps Script that lists the album folders (see Claude_drive_sync.gs).
      Leave it empty to turn the sync off. */
-  sync: {url: ''},
+  sync: {url: 'https://script.google.com/macros/s/AKfycbxohk4lyXhFX1k34P1hCR0_dncOvm_JCShaBkjey_sd2CYybwYQu6krCKnuIJEVvEHrwQ/exec'},
 
   /* Contact form. Messages are forwarded to your inbox by FormSubmit (formsubmit.co).
      formId is the random string FormSubmit gave you after you activated the form. It stands in for your email
