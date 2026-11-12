@@ -306,7 +306,7 @@ function albumNameIn(albums, id){ var a = albums.filter(function(x){ return x.id
 
 /* ---- Home ---- */
 function renderHome(){
-  var photo = S.photos[0], coll = S.collections[0];
+  var photo = HOME.photo, coll = HOME.coll;
   main.innerHTML =
   '<div class="shell"><section class="home-hero" aria-label="'+esc(L(P.name))+'">' +
     '<div class="home-copy">' +
@@ -600,8 +600,63 @@ function initPTR(){
   document.addEventListener('touchcancel', function(){ if(!busy) reset(); }, {passive:true});
 }
 
+/* ================= Google Drive sync =================
+   A small Google Apps Script (the "sync" web address in data.js) lists the pictures in the album folders in Drive.
+   Photos that are in a folder but not in data.js are added automatically (newest first); a photo moved to another
+   album folder shows in that album; a photo removed from the folders disappears. Photos already written in data.js
+   keep their own title and caption. If the address is empty or unreachable, the site shows data.js as it is. */
+var BASE = {photos: S.photos.slice(), life: S.life.items.slice(), lego: null};
+var LEGO = null; S.collections.forEach(function(c){ if(c.id === 'lego') LEGO = c; });
+if(LEGO) BASE.lego = LEGO.items.slice();
+var HOME = {photo: S.photos[0], coll: {items: [S.collections[0].items[0]]}};
+var CAMERA = /^(IMG|DSC|DSCN|DJI|PXL|MVIMG|0K9A|_?MG|P\d{3})[-_ ]?\d+/i;
+function mergeGroup(base, feed, album, albums, label){
+  var inFeed = {}, known = {};
+  feed.forEach(function(f){ inFeed[f.id] = f; });
+  base.forEach(function(b){ if(b.drive) known[b.drive] = true; });
+  var added = feed.filter(function(f){ return !known[f.id]; }).sort(function(a, b){ return (b.t || 0) - (a.t || 0); }).map(function(f){
+    var nm = String(f.n || '').replace(/\.[A-Za-z0-9]+$/, '').replace(/_/g, ' ').trim(), ttl;
+    if(!nm || CAMERA.test(nm)){ var a = albums && albums.filter(function(x){ return x.id === f.a; })[0]; ttl = a ? a.name : (label || {en:'Photo', zh:'照片'}); }
+    else ttl = {en: nm, zh: nm};
+    var it = {id: 'd' + f.id.slice(-8), drive: f.id, w: f.w || 1600, h: f.h || 1067, title: ttl, caption: ''};
+    if(album === 'photo' || album === 'life') it.album = f.a; else it.meta = label || {en:'', zh:''};
+    return it;
+  });
+  var kept = base.filter(function(b){ return !b.drive || inFeed[b.drive]; }).map(function(b){
+    if(b.drive && inFeed[b.drive] && (album === 'photo' || album === 'life') && inFeed[b.drive].a !== b.album){ var c = {}; for(var k in b) c[k] = b[k]; c.album = inFeed[b.drive].a; return c; }
+    return b;
+  });
+  return added.concat(kept);
+}
+function applyFeed(feed){
+  if(!feed || !feed.items || !feed.items.length) return;
+  var photo = [], life = [], lego = [];
+  feed.items.forEach(function(f){
+    var p = String(f.f || '').split(':'); if(!f.id) return;
+    var o = {id: f.id, n: f.name || f.n, t: f.t ? (typeof f.t === 'number' ? f.t : Date.parse(f.t)) : 0, w: f.w, h: f.h, a: p[1]};
+    if(p[0] === 'photo') photo.push(o); else if(p[0] === 'life') life.push(o); else if(p[0] === 'coll' && p[1] === 'lego') lego.push(o);
+  });
+  S.photos = mergeGroup(BASE.photos, photo, 'photo', S.albums);
+  S.life.items = mergeGroup(BASE.life, life, 'life', S.life.albums);
+  if(LEGO && BASE.lego) LEGO.items = mergeGroup(BASE.lego, lego, 'coll', null, LEGO.name);
+}
+function syncDrive(){
+  var url = S.sync && S.sync.url; if(!url || !window.fetch) return;
+  var cached = ''; try{ cached = localStorage.getItem('driveFeed') || ''; }catch(e){}
+  if(cached){ try{ applyFeed(JSON.parse(cached)); }catch(e){} }
+  var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function(){ if(ctl) ctl.abort(); }, 12000);
+  fetch(url, ctl ? {signal: ctl.signal} : {}).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(txt){
+    clearTimeout(to);
+    var feed = JSON.parse(txt); if(!feed || !feed.items || !feed.items.length || txt === cached) return;
+    try{ localStorage.setItem('driveFeed', txt); }catch(e){}
+    if(lb) return;                    /* a viewer is open: the new photos show on the next page load */
+    applyFeed(feed); renderAll();
+  }).catch(function(){ clearTimeout(to); });
+}
+
 lang = detectLang();
 bindHeaderOnce();
+syncDrive();
 renderAll();
 initPTR();
 })();

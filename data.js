@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.8451.703.26', date: '2026-11-12'},
+  version: {number: '1.9163.775.48', date: '2026-11-12'},
 
   profile: {
     name: {en: 'Matthew Wang', zh: '馬修'},
@@ -24,6 +24,10 @@ window.SITE = {
       {label: 'LinkedIn', href: 'https://www.linkedin.com/in/teng-yen-wang-a97999340/'}
     ]
   },
+
+  /* Google Drive sync. url is the web address of the Apps Script that lists the album folders (see Claude_drive_sync.gs).
+     Leave it empty to turn the sync off. */
+  sync: {url: ''},
 
   /* Contact form. Messages are forwarded to your inbox by FormSubmit (formsubmit.co).
      formId is the random string FormSubmit gave you after you activated the form. It stands in for your email
