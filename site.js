@@ -162,12 +162,18 @@ function renderHeader(){
         '<button type="button" class="caret" aria-expanded="false" aria-haspopup="true" aria-label="'+esc(t('open_menu', n.label))+'"></button>' +
         '<ul class="sub">' + n.sub.map(function(s){ return '<li><a href="'+s.href+'">'+esc(s.label)+'</a></li>'; }).join('') + '</ul></li>';
     }).join('') + '</ul>' +
-    '<div class="lang" role="group" aria-label="'+esc(t('lang_group'))+'">' +
+    '<div class="nav-tools"><div class="lang" role="group" aria-label="'+esc(t('lang_group'))+'">' +
       '<button type="button" lang="en" data-lang="en" aria-pressed="'+(lang === 'en')+'" aria-label="English">EN</button>' +
       '<button type="button" lang="zh-Hant-TW" data-lang="zh" aria-pressed="'+(lang === 'zh')+'" aria-label="繁體中文">中文</button>' +
-    '</div></nav></div><div class="progress" id="progress"></div>';
+    '</div>' + themeBtn() + '</div></nav></div><div class="progress" id="progress"></div>';
   updateProgress();
 }
+var SUN = '<svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>';
+var MOON = '<svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8 8 0 0 1 9.8 4a8 8 0 1 0 10.2 10.2z"/></svg>';
+function themeLabel(){ return t(window.THEME && THEME.get() === 'dark' ? 'theme_to_light' : 'theme_to_dark'); }
+function themeBtn(){ var l = esc(themeLabel()); return '<button type="button" class="theme-btn" title="'+l+'" aria-label="'+l+'">'+SUN+MOON+'</button>'; }
+function syncThemeBtn(){ var b = $('.theme-btn'); if(b){ var l = themeLabel(); b.setAttribute('aria-label', l); b.setAttribute('title', l); } }
+if(window.THEME) THEME.onchange(syncThemeBtn);
 function closeSubs(except){
   $$('#top .has-sub.open').forEach(function(li){ if(li !== except){ li.classList.remove('open'); $('.caret', li).setAttribute('aria-expanded','false'); } });
 }
@@ -179,8 +185,9 @@ function updateProgress(){
 function bindHeaderOnce(){
   var h = $('#top');
   h.addEventListener('click', function(e){
-    var m = e.target.closest('.menu-btn'), c = e.target.closest('.caret'), g = e.target.closest('[data-lang]');
-    if(m){ var open = !h.classList.contains('open'); h.classList.toggle('open', open); m.setAttribute('aria-expanded', String(open)); }
+    var m = e.target.closest('.menu-btn'), c = e.target.closest('.caret'), g = e.target.closest('[data-lang]'), th = e.target.closest('.theme-btn');
+    if(th){ THEME.toggle(); }
+    else if(m){ var open = !h.classList.contains('open'); h.classList.toggle('open', open); m.setAttribute('aria-expanded', String(open)); }
     else if(c){ e.stopPropagation(); var li = c.parentNode, o = !li.classList.contains('open'); closeSubs(li); li.classList.toggle('open', o); c.setAttribute('aria-expanded', String(o)); }
     else if(g){ setLang(g.getAttribute('data-lang')); }
   });

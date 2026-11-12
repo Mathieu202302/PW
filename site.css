@@ -13,10 +13,28 @@
   --film-line:#28333A;
   --film-text:#A7B2B5;
   --amber:#F0B429;
+  --top-bg:rgba(233,237,236,.94);
+  --on-teal:#fff;
+  --err:#9A2F1F;
   --display:"Archivo","Helvetica Neue",Arial,sans-serif;
   --body:"Source Serif 4",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   color-scheme:light;
+}
+/* Dark theme: same lightbox idea turned around, so photographs glow on a near-black page. */
+:root[data-theme="dark"]{
+  --paper:#0E1315;
+  --paper-2:#192226;
+  --ink:#E7EDEC;
+  --graphite:#9AA8AB;
+  --rule:#2B373B;
+  --teal:#4FC3BE;
+  --film:#06090A;
+  --film-2:#0F1619;
+  --top-bg:rgba(14,19,21,.92);
+  --on-teal:#061012;
+  --err:#F29B8C;
+  color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -36,7 +54,7 @@ h1:focus{outline:none}
 @media (max-width:720px){.shell{padding-left:20px;padding-right:20px}}
 
 /* ---------- header and navigation ---------- */
-.top{position:sticky;top:0;z-index:40;background:rgba(233,237,236,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.top{position:sticky;top:0;z-index:40;background:var(--top-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
 .top-in{max-width:1240px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:24px;min-height:58px}
 .brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-stretch:118%;font-weight:700;font-size:1rem;letter-spacing:-.01em;text-decoration:none}
 .brand img{display:block;height:28px;width:auto}
@@ -54,7 +72,7 @@ h1:focus{outline:none}
 .sub{position:absolute;top:100%;left:0;z-index:50;min-width:220px;margin:0;padding:8px;list-style:none;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 22px 40px -20px rgba(6,9,10,.5);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility 0s .15s}
 .has-sub:hover>.sub,.has-sub:focus-within>.sub,.has-sub.open>.sub{opacity:1;visibility:visible;transform:none;transition:opacity .15s,transform .15s,visibility 0s 0s}
 .sub a{display:block;padding:9px 12px;border-radius:4px;font:500 .95rem var(--display);text-decoration:none}
-.sub a:hover,.sub a:focus-visible{background:var(--teal);color:#fff}
+.sub a:hover,.sub a:focus-visible{background:var(--teal);color:var(--on-teal)}
 .menu-btn{display:none;margin-left:auto;background:transparent;border:1px solid var(--rule);border-radius:4px;padding:7px 12px;font:500 .9rem var(--display);cursor:pointer}
 .menu-btn:hover{border-color:var(--ink)}
 .progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--teal);transform-origin:0 50%;transform:scaleX(0)}
@@ -266,9 +284,9 @@ h1:focus{outline:none}
 .msg label{display:block;font:600 1rem var(--display);margin-bottom:8px}
 .msg input[type="text"],.msg input[type="email"]{display:block;width:100%;padding:12px 16px;border:1px solid var(--graphite);border-radius:4px;background:var(--paper);color:var(--ink);font:400 1.05rem/1.4 var(--body)}
 .msg input[type="text"]:focus-visible,.msg input[type="email"]:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-.msg [aria-invalid="true"]{border-color:#9a2f1f;border-width:2px}
+.msg [aria-invalid="true"]{border-color:var(--err);border-width:2px}
 .fld-hint{margin:6px 0 0;font:400 .9rem var(--display);color:var(--graphite)}
-.fld-err{margin:6px 0 0;font:500 .92rem var(--display);color:#9a2f1f}
+.fld-err{margin:6px 0 0;font:500 .92rem var(--display);color:var(--err)}
 .fld-err:empty{display:none}
 .msg textarea{display:block;width:100%;min-height:220px;padding:14px 16px;border:1px solid var(--graphite);border-radius:4px;background:var(--paper);color:var(--ink);font:400 1.05rem/1.55 var(--body);resize:vertical}
 .msg textarea:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
@@ -277,7 +295,7 @@ h1:focus{outline:none}
 .btn:disabled{opacity:.55;cursor:wait}
 .msg-status{font:500 .98rem var(--display);color:var(--graphite)}
 .msg-status[data-kind="ok"]{color:var(--teal)}
-.msg-status[data-kind="err"]{color:#9a2f1f}
+.msg-status[data-kind="err"]{color:var(--err)}
 
 .foot-id{display:flex;align-items:center;gap:24px}
 .foot-logo{display:block;height:120px;width:auto;flex:none}  /* height is matched to the Say hello block by site.js */
@@ -288,7 +306,17 @@ h1:focus{outline:none}
 .lang button{border:0;background:transparent;padding:4px 11px;border-radius:999px;font:600 .8rem var(--display);color:var(--graphite);cursor:pointer}
 .lang button:hover{color:var(--ink)}
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-@media (max-width:900px){.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.lang{align-self:flex-start;margin-top:14px}}
+/* The two logos are dark ink on transparent; lighten them on the dark theme. */
+:root[data-theme="dark"] .brand img{filter:invert(1) hue-rotate(180deg) brightness(1.25)}
+:root[data-theme="dark"] .foot-logo{filter:invert(1) opacity(.9)}
+.nav-tools{display:flex;align-items:center;gap:10px}
+.theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--rule);border-radius:999px;background:transparent;color:var(--graphite);cursor:pointer}
+.theme-btn:hover{color:var(--ink);border-color:var(--ink)}
+.theme-btn svg{display:block;width:18px;height:18px}
+.theme-btn .i-sun{display:none}
+:root[data-theme="dark"] .theme-btn .i-sun{display:block}
+:root[data-theme="dark"] .theme-btn .i-moon{display:none}
+@media (max-width:900px){.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.nav-tools{align-self:flex-start;margin-top:14px}}
 
 /* ---------- Traditional Chinese (Taiwan) typography ---------- */
 html[lang="zh-Hant-TW"]{

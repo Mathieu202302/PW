@@ -3,6 +3,7 @@
 window.I18N = {
 en: {
   skip: 'Skip to content', menu: 'Menu', nav_main: 'Main', lang_group: 'Language',
+  theme_to_dark: 'Switch to dark mode', theme_to_light: 'Switch to light mode',
   photography: 'Photography', collections: 'Collections', life: 'My life', career: 'Career', about: 'About me',
   open_menu: function(n){ return 'Open the ' + n + ' menu'; },
   all: 'All', all_photos: 'All photos', all_collections: 'All collections', all_life: 'All of my life',
@@ -54,6 +55,7 @@ en: {
 },
 zh: {
   skip: '跳到主要內容', menu: '選單', nav_main: '主選單', lang_group: '語言',
+  theme_to_dark: '切換為深色模式', theme_to_light: '切換為淺色模式',
   photography: '攝影', collections: '收藏', life: '我的生活', career: '學經歷', about: '關於我',
   open_menu: function(n){ return '開啟「' + n + '」選單'; },
   all: '全部', all_photos: '所有照片', all_collections: '所有收藏', all_life: '所有生活紀錄',
