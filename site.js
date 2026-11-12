@@ -314,7 +314,7 @@ function renderHome(){
   '<section class="band"><div class="shell band-in"><h2>'+esc(t('explore'))+'</h2><div class="explore">' +
     '<a class="ex photo" href="photography.html"><img src="'+srcOf(photo, 1200)+'" alt="" referrerpolicy="no-referrer"><h3>'+esc(t('photography'))+'</h3><p>'+esc(t('ex_photo_p'))+'</p></a>' +
     '<a class="ex coll" href="collections.html"><img src="'+srcOf(coll.items[0], 1200)+'" alt="" referrerpolicy="no-referrer"><h3>'+esc(t('collections'))+'</h3><p>'+esc(t('ex_coll_p'))+'</p></a>' +
-    '<a class="ex career" href="career.html"><div class="ann">'+esc(t('ann_career'))+'</div><div><h3>'+esc(t('career'))+'</h3><p>'+esc(t('ex_career_p'))+'</p></div></a>' +
+    '<a class="ex career" href="career.html"><img src="career-bg.jpg" alt="" width="1000" height="675"><div class="ann">'+esc(t('ann_career'))+'</div><div><h3>'+esc(t('career'))+'</h3><p>'+esc(t('ex_career_p'))+'</p></div></a>' +
     '<a class="ex" href="about.html"><img src="matthew-wide.jpg" alt="" style="object-position:62% 40%"><h3>'+esc(t('about'))+'</h3><p>'+esc(t('ex_about_p'))+'</p></a>' +
   '</div></div></section>';
   function clock(){
