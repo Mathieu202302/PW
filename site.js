@@ -232,10 +232,10 @@ function buildLB(){
   el.className = 'lb'; el.hidden = true; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label', t('lb_viewer'));
   el.innerHTML =
     '<div class="lb-top"><output aria-live="polite"></output><button type="button" class="lb-btn" data-a="close">'+esc(t('close'))+'</button></div>' +
-    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="'+esc(t('prev'))+'">&#8249;</button><img alt="" referrerpolicy="no-referrer"><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="'+esc(t('next'))+'">&#8250;</button></div>' +
+    '<div class="lb-stage"><button type="button" class="lb-btn lb-nav prev" data-a="prev" aria-label="'+esc(t('prev'))+'">&#8249;</button><img alt="" referrerpolicy="no-referrer"><i class="lb-wm" aria-hidden="true" hidden></i><button type="button" class="lb-btn lb-nav next" data-a="next" aria-label="'+esc(t('next'))+'">&#8250;</button></div>' +
     '<div class="lb-cap"></div><div class="lb-strip" role="group" aria-label="'+esc(t('all_images'))+'"></div>';
   document.body.appendChild(el);
-  lb = {el:el, img:$('img', el), out:$('output', el), cap:$('.lb-cap', el), strip:$('.lb-strip', el), stage:$('.lb-stage', el)};
+  lb = {el:el, img:$('img', el), wm:$('.lb-wm', el), out:$('output', el), cap:$('.lb-cap', el), strip:$('.lb-strip', el), stage:$('.lb-stage', el)};
   el.addEventListener('click', function(e){
     var a = e.target.closest('[data-a]'), j = e.target.closest('[data-j]');
     if(a){ var k = a.getAttribute('data-a'); if(k === 'close') closeLB(); else step(k === 'next' ? 1 : -1); }
@@ -264,13 +264,25 @@ document.addEventListener('keydown', function(e){
     else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
   }
 });
+/* The signature watermark sits in the bottom right corner of the photo itself (not of the whole stage). */
+function placeWM(){
+  if(!lb || !lb.wm) return;
+  var im = lb.img;
+  if(im.hidden || !im.complete || !im.naturalWidth){ lb.wm.hidden = true; return; }
+  var r = im.getBoundingClientRect(), s = lb.stage.getBoundingClientRect(), w = Math.max(40, Math.min(110, Math.round(r.width * 0.13)));
+  lb.wm.style.width = w + 'px'; lb.wm.style.height = w + 'px';
+  lb.wm.style.left = Math.round(r.right - s.left - w - 12) + 'px';
+  lb.wm.style.top = Math.round(r.bottom - s.top - w - 10) + 'px';
+  lb.wm.hidden = false;
+}
+addEventListener('resize', placeWM);
 function step(d){ var n = lbState.list.length; lbState.i = (lbState.i + d + n) % n; showLB(); }
 function clearVideo(){ var f = $('iframe', lb.stage); if(f) f.remove(); }
 function showLB(){
   var it = lbState.list[lbState.i], auto = lbState.auto; lbState.auto = false;
   clearVideo();
   if(it.video){
-    lb.img.hidden = true;
+    lb.img.hidden = true; lb.wm.hidden = true;
     var f = document.createElement('iframe');
     f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(it.video) + '?rel=0&hl=' + (lang === 'zh' ? 'zh-TW' : 'en') + (auto ? '&autoplay=1' : '');
     f.title = it.title; f.allowFullscreen = true;
@@ -278,7 +290,7 @@ function showLB(){
     f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     lb.stage.insertBefore(f, $('.next', lb.stage));
   } else {
-    lb.img.hidden = false; lb.img.src = it.src; lb.img.alt = it.note || it.title;
+    lb.wm.hidden = true; lb.img.hidden = false; lb.img.onload = placeWM; lb.img.src = it.src; lb.img.alt = it.note || it.title; if(lb.img.complete) placeWM();
   }
   lb.out.textContent = (lbState.i + 1) + ' / ' + lbState.list.length;
   lb.cap.innerHTML = esc(it.title) + (it.note ? '<em>' + esc(it.note) + '</em>' : '') + '<span>' + esc(it.meta) + '</span>';
