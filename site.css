@@ -351,12 +351,12 @@ h1:focus{outline:none}
 .theme-btn:hover{color:var(--ink);border-color:var(--ink)}
 .theme-btn svg{display:block;width:18px;height:18px}
 .top .top-theme{display:none}
-:root[data-app] .theme-btn{display:none}
+:root[data-app] .top-theme{display:none}
 .theme-btn .i-sun{display:none}
 :root[data-theme="dark"] .theme-btn .i-sun{display:block}
 :root[data-theme="dark"] .theme-btn .i-moon{display:none}
 /* Narrow windows and phones: the switch sits in the top bar next to Menu, so it is always in view. */
-@media (max-width:900px){.top .top-theme{display:inline-flex;margin-left:auto;margin-right:-14px}.top .top-theme+.menu-btn{margin-left:0}.nav-tools .theme-btn{display:none}.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.nav-tools{align-self:flex-start;margin-top:14px}}
+@media (max-width:900px){.top .top-theme{display:inline-flex;margin-left:auto;margin-right:-14px}:root:not([data-app]) .top .top-theme+.menu-btn{margin-left:0}:root:not([data-app]) .nav-tools .theme-btn{display:none}.nav{flex-direction:column;align-items:stretch;gap:0}.top.open .nav{display:flex}.nav-tools{align-self:flex-start;margin-top:14px}}
 
 /* ---------- Traditional Chinese (Taiwan) typography ---------- */
 html[lang="zh-Hant-TW"]{
