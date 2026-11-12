@@ -210,12 +210,16 @@ function syncFooterLogo(){
   if(footRO){ footRO.disconnect(); footRO = null; }
   if(window.ResizeObserver){ footRO = new ResizeObserver(fit); footRO.observe(tx); }
 }
+function shopLink(){
+  var u = ''; (S.collections || []).forEach(function(c){ if(!u && c.shop && c.shop.url) u = c.shop.url; });
+  return u ? '<li><a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(t('shop_btn'))+'</a></li>' : '';
+}
 function renderFooter(){
   $('#foot').innerHTML =
     '<div class="shell foot-in"><div class="foot-id"><img class="foot-logo" src="footer-logo.png" width="560" height="560" alt="" aria-hidden="true">' +
     '<div class="foot-txt"><p class="foot-h display">'+esc(t('foot_h'))+'</p><p class="foot-sub">'+esc(t('foot_sub'))+'</p>' +
     '<a class="btn solid foot-cta" href="contact.html">'+esc(t('contact_btn'))+'</a></div></div>' +
-    '<ul class="links">' +
+    '<ul class="links">' + shopLink() +
     P.links.map(function(l){ return '<li><a href="'+esc(l.href)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a></li>'; }).join('') +
     '</ul></div><div class="shell copy"><p>'+esc(t('foot_rights', NAME_EN))+'</p><p class="legal">'+esc(t('foot_legal', NAME_EN))+'</p>'+versionHTML()+'</div>';
   syncFooterLogo();
