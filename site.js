@@ -332,6 +332,7 @@ function heroHTML(H){
   return '<section class="hero" id="hero" aria-label="'+esc(t('hero_label'))+'">' +
     '<img class="hero-bg" src="'+driveImg(H.drive, 2200)+'" alt="'+esc(t('hero_alt'))+'" style="object-position:'+esc(H.pos || '50% 50%')+'" fetchpriority="high" referrerpolicy="no-referrer">' +
     '<div class="hero-shade"></div>' +
+    '<canvas class="hero-sky" aria-hidden="true"></canvas>' +
     '<div class="hero-title" role="img" aria-label="'+esc(t('hero_word'))+'">'+word+'</div>' +
     '<button type="button" class="scroll-cue" aria-label="'+esc(t('hero_scroll'))+'"><span class="chev"></span><span class="chev"></span></button>' +
     '<p class="hero-cap">'+esc(L(H.caption))+'</p></section>';
@@ -378,6 +379,77 @@ function heroGo(y){
   var tries = 0;
   (function wait(){ if(Math.abs(scrollY - y) < 2 || tries++ > 40){ heroTimer = setTimeout(function(){ heroBusy = false; }, 450); } else setTimeout(wait, 50); })();
 }
+/* Twinkling stars and a shooting star now and then in the dark sky above the skyline (the photo's top part).
+   It is a canvas over the photo, paused while the opening screen is scrolled away or the tab is hidden. With reduced motion the stars stay still. */
+var SKY_LINE = .185;     /* where the dark sky ends, as a share of the photo's height */
+var SKY_STARS = (function(){ var a = [], i, r; for(i = 0; i < 170; i++){ r = Math.random(); a.push({x: Math.random(), y: Math.pow(Math.random(), .85), r: r < .66 ? .5 + Math.random() * .45 : (r < .92 ? 1 + Math.random() * .5 : 1.6 + Math.random() * .5),
+  a: .5 + Math.random() * .5, sp: 1 + Math.random() * 2.6, ph: Math.random() * 6.283, c: Math.random() < .22 ? '190,215,255' : (Math.random() < .2 ? '255,232,200' : '255,255,255')}); } return a; })();
+function skyFX(hero, H){
+  var cv = $('.hero-sky', hero), img = $('.hero-bg', hero); if(!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d'), W = 0, SH = 0, N = 0, meteor = null, nextM = 0, raf = 0, seen = true, t0 = 0;
+  var py = parseFloat(String(H.pos || '50% 50%').split(/\s+/)[1]) / 100; if(isNaN(py)) py = .5;
+  function layout(){
+    var w = hero.clientWidth, h = hero.clientHeight; if(!w || !h) return;
+    var ratio = img.naturalWidth ? img.naturalWidth / img.naturalHeight : 1.5;
+    var dh = Math.max(h, w / ratio), sky = Math.round(Math.max(0, Math.min(h, (h - dh) * py + dh * SKY_LINE)));
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = w; SH = sky; N = Math.max(0, Math.min(SKY_STARS.length, Math.round(w * sky / 2300)));
+    cv.style.height = sky + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(sky * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if(REDUCED || !raf) draw(performance.now());
+  }
+  function newMeteor(now){
+    var dir = Math.random() < .5 ? -1 : 1, ang = (10 + Math.random() * 12) * Math.PI / 180, sp = 560 + Math.random() * 260;
+    meteor = {x: dir < 0 ? W * (.45 + Math.random() * .5) : W * (.05 + Math.random() * .5), y: SH * (.04 + Math.random() * .3), vx: dir * Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+      len: Math.max(90, Math.min(190, W * .12)), born: now, life: 900 + Math.random() * 500};
+  }
+  function draw(now){
+    ctx.clearRect(0, 0, W, SH); if(!SH) return;
+    var i, s, x, y, tw, al, edge;
+    for(i = 0; i < N; i++){
+      s = SKY_STARS[i]; x = s.x * W; y = s.y * SH;
+      tw = REDUCED ? .75 : Math.pow(.5 + .5 * Math.sin(now / 1000 * s.sp + s.ph), 1.6);
+      edge = s.y > .7 ? Math.max(0, 1 - (s.y - .7) / .3) : 1;
+      al = s.a * (.2 + .8 * tw) * edge;
+      ctx.fillStyle = 'rgba(' + s.c + ',' + al.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(x, y, s.r, 0, 6.2832); ctx.fill();
+      if(s.r > 1.55 && tw > .35){                       /* the brightest stars get a small cross-shaped glint */
+        var g = s.r * 5 * tw; ctx.strokeStyle = 'rgba(' + s.c + ',' + (al * .55).toFixed(3) + ')'; ctx.lineWidth = .7;
+        ctx.beginPath(); ctx.moveTo(x - g, y); ctx.lineTo(x + g, y); ctx.moveTo(x, y - g); ctx.lineTo(x, y + g); ctx.stroke();
+      }
+    }
+    if(meteor){
+      var k = (now - meteor.born) / meteor.life;
+      if(k >= 1){ meteor = null; }
+      else {
+        var el = (now - meteor.born) / 1000, hx = meteor.x + meteor.vx * el, hy = meteor.y + meteor.vy * el, n = Math.hypot(meteor.vx, meteor.vy);
+        var tx = hx - meteor.vx / n * meteor.len, ty = hy - meteor.vy / n * meteor.len;
+        var env = Math.min(1, k / .15) * Math.min(1, (1 - k) / .45), low = Math.max(0, Math.min(1, (SH * .92 - hy) / (SH * .3)));
+        al = env * low;
+        if(al > .01){
+          var gr = ctx.createLinearGradient(hx, hy, tx, ty);
+          gr.addColorStop(0, 'rgba(255,255,255,' + (.95 * al).toFixed(3) + ')'); gr.addColorStop(.35, 'rgba(190,215,255,' + (.35 * al).toFixed(3) + ')'); gr.addColorStop(1, 'rgba(190,215,255,0)');
+          ctx.strokeStyle = gr; ctx.lineWidth = 1.7; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(tx, ty); ctx.stroke();
+          ctx.fillStyle = 'rgba(255,255,255,' + (.9 * al).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(hx, hy, 1.5, 0, 6.2832); ctx.fill();
+          ctx.fillStyle = 'rgba(200,220,255,' + (.18 * al).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(hx, hy, 5, 0, 6.2832); ctx.fill();
+        }
+      }
+    }
+  }
+  function frame(now){
+    raf = 0; if(!cv.isConnected) return;
+    if(!t0){ t0 = now; nextM = now + 2600; }
+    if(!meteor && now >= nextM && SH > 40){ newMeteor(now); nextM = now + 4200 + Math.random() * 5200; }
+    draw(now); run();
+  }
+  function run(){ if(!raf && !REDUCED && seen && !document.hidden && cv.isConnected) raf = requestAnimationFrame(frame); }
+  function onSize(){ if(!cv.isConnected){ removeEventListener('resize', onSize); return; } layout(); }
+  addEventListener('resize', onSize);
+  document.addEventListener('visibilitychange', function(){ if(cv.isConnected) run(); });
+  if(window.IntersectionObserver){ var io = new IntersectionObserver(function(e){ if(!cv.isConnected){ io.disconnect(); return; } seen = e[0].isIntersecting; run(); }); io.observe(hero); }
+  img.addEventListener('load', layout);
+  layout(); run();
+}
 function initHero(H){
   var hero = $('#hero'), cv = $('.hero-write', hero);
   hero.classList.toggle('played', heroPlayed || REDUCED);
@@ -385,6 +457,7 @@ function initHero(H){
   heroPlayed = true;
   $('.hero-bg', hero).addEventListener('load', function(){ hero.classList.add('lit'); });
   if($('.hero-bg', hero).complete) hero.classList.add('lit');
+  skyFX(hero, H);
   $('.scroll-cue', hero).addEventListener('click', function(){ heroGo(heroTarget()); });
   if(heroBound) return; heroBound = true;
   /* One scroll or swipe moves between the opening screen and the page. */

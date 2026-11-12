@@ -7,11 +7,11 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.7019.322.84', date: '2026-11-12'},
+  version: {number: '1.7584.337.12', date: '2026-11-12'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
-  hero: {drive: '1UorYD7yhsUwn9DUslIpssrStakndWo0c', pos: '50% 45%', caption: {en: 'Tokyo, 2025', zh: '東京，2025'}},
+  hero: {drive: '1UorYD7yhsUwn9DUslIpssrStakndWo0c', pos: '50% 18%', caption: {en: 'Tokyo, 2025', zh: '東京，2025'}},
 
   profile: {
     name: {en: 'Matthew Wang', zh: '馬修'},
