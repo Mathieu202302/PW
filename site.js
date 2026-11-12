@@ -268,7 +268,8 @@ document.addEventListener('keydown', function(e){
 function placeWM(){
   if(!lb || !lb.wm) return;
   var im = lb.img;
-  if(im.hidden || !im.complete || !im.naturalWidth){ lb.wm.hidden = true; return; }
+  var cur = lbState.list[lbState.i];
+  if(im.hidden || !im.complete || !im.naturalWidth || (cur && cur.wm)){ lb.wm.hidden = true; return; }
   var r = im.getBoundingClientRect(), s = lb.stage.getBoundingClientRect(), w = Math.max(40, Math.min(110, Math.round(r.width * 0.13)));
   lb.wm.style.width = w + 'px'; lb.wm.style.height = w + 'px';
   lb.wm.style.left = Math.round(r.right - s.left - w - 12) + 'px';
@@ -478,7 +479,7 @@ function renderGallery(cfg){
     var tmp = document.createElement('div');
     tmp.innerHTML = items.map(function(p, i){
       var vid = !!p.video;
-      return '<button type="button" class="tile'+(vid ? ' video' : '')+'" data-i="'+i+'" aria-label="'+esc(t(vid ? 'open_video' : 'open_photo', L(p.title)))+'">' +
+      return '<button type="button" class="tile'+(vid ? ' video' : '')+(p.wm ? ' wmd' : '')+'" data-i="'+i+'" aria-label="'+esc(t(vid ? 'open_video' : 'open_photo', L(p.title)))+'">' +
         '<img src="'+srcOf(p, 800)+'" alt="'+esc(p.caption ? L(p.caption) : L(p.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
         '<span class="cap"><b>'+esc(L(p.title))+'</b><span>'+esc(albumNameIn(cfg.albums, p.album))+'</span></span>' +
         (vid ? '<span class="vbadge" aria-hidden="true"></span>' : (hasImg(p) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>')) + '</button>';
@@ -492,7 +493,7 @@ function renderGallery(cfg){
     var tile = e.target.closest('.tile'); if(!tile) return;
     openLB(items.map(function(p){
       return {src:srcOf(p, 2000), thumb:srcOf(p, 160), video:p.video || '', title:L(p.title), note:p.caption ? L(p.caption) : '',
-        meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (hasImg(p) ? '' : t('placeholder_meta')))};
+        wm:!!p.wm, meta:albumNameIn(cfg.albums, p.album) + (p.video ? t('video_meta') : (hasImg(p) ? '' : t('placeholder_meta')))};
     }), parseInt(tile.getAttribute('data-i'), 10), tile);
   });
   if(window.ResizeObserver){
@@ -549,10 +550,10 @@ function renderCollections(){
     var n = shown.reduce(function(sum, c){ return sum + c.items.length; }, 0);
     $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
-      lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
+      lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), wm:!!it.wm, title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
       return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid">' +
         c.items.map(function(it, i){
-          return '<button type="button" class="tile" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
+          return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
             '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
             '<span class="cap"><b>'+esc(L(it.title))+'</b><span>'+esc(L(it.meta))+'</span></span>' + (hasImg(it) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
         }).join('') + '</div></section>';
@@ -729,7 +730,7 @@ var CAMERA = /^(IMG|DSC|DSCN|DJI|PXL|MVIMG|0K9A|_?MG|P\d{3})[-_ ]?\d+/i;
 function mergeGroup(base, feed, album, albums, label){
   var inFeed = {}, known = {};
   feed.forEach(function(f){ inFeed[f.id] = f; });
-  base.forEach(function(b){ if(b.drive) known[b.drive] = true; });
+  base.forEach(function(b){ if(b.drive) known[b.drive] = true; if(b.orig) known[b.orig] = true; });
   var added = feed.filter(function(f){ return !known[f.id]; }).sort(function(a, b){ return (b.t || 0) - (a.t || 0); }).map(function(f){
     var nm = String(f.n || '').replace(/\.[A-Za-z0-9]+$/, '').replace(/_/g, ' ').trim(), ttl;
     if(!nm || CAMERA.test(nm)){ var a = albums && albums.filter(function(x){ return x.id === f.a; })[0]; ttl = a ? a.name : (label || {en:'Photo', zh:'照片'}); }
@@ -738,8 +739,9 @@ function mergeGroup(base, feed, album, albums, label){
     if(album === 'photo' || album === 'life') it.album = f.a; else it.meta = label || {en:'', zh:''};
     return it;
   });
-  var kept = base.filter(function(b){ return !b.drive || inFeed[b.drive]; }).map(function(b){
-    if(b.drive && inFeed[b.drive] && (album === 'photo' || album === 'life') && inFeed[b.drive].a !== b.album){ var c = {}; for(var k in b) c[k] = b[k]; c.album = inFeed[b.drive].a; return c; }
+  var kept = base.filter(function(b){ return !b.drive || inFeed[b.orig || b.drive]; }).map(function(b){
+    var fi = inFeed[b.orig || b.drive];
+    if(b.drive && fi && (album === 'photo' || album === 'life') && fi.a !== b.album){ var c = {}; for(var k in b) c[k] = b[k]; c.album = fi.a; return c; }
     return b;
   });
   return added.concat(kept);
