@@ -586,8 +586,20 @@ function renderLife(){ var f = S.life.featured; renderGallery({top:(f && f.id ? 
 
 /* ---- Collections ---- */
 function youtubeHTML(y, hKey, pKey){
-  return '<div class="yt"><div class="yt-copy"><h3>'+esc(t(hKey || 'yt_h'))+'</h3><p>'+esc(t(pKey || 'yt_p'))+'</p>' +
-    '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>' +
+  var ch = y.channel, copy;
+  if(ch && ch.id){
+    var base = 'https://www.youtube.com/channel/' + encodeURIComponent(ch.id);
+    copy = '<div class="yt-copy yt-chan"><h3>'+esc(t(hKey || 'yt_h'))+'</h3>' +
+      '<div class="yt-id"><img class="yt-av" src="icon-192.png" alt="" width="56" height="56"><b>'+esc(ch.name)+'</b></div>' +
+      '<p>'+esc(t(pKey || 'yt_p'))+'</p>' +
+      '<div class="yt-acts"><a class="btn yt-sub" href="'+base+'?sub_confirmation=1" target="_blank" rel="noopener noreferrer">'+esc(t('yt_sub'))+'</a>' +
+      '<a class="btn line" href="'+base+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_visit'))+'</a></div>' +
+      '<small class="yt-note">'+esc(t('yt_sub_note'))+'</small></div>';
+  } else {
+    copy = '<div class="yt-copy"><h3>'+esc(t(hKey || 'yt_h'))+'</h3><p>'+esc(t(pKey || 'yt_p'))+'</p>' +
+      '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>';
+  }
+  return '<div class="yt">' + copy +
     '<div class="yt-frame" data-v="'+esc(y.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +
       '<img src="'+ytThumb(y.id)+'" alt="" loading="lazy"><span class="yt-btn" aria-hidden="true"></span></button></div></div>';
 }

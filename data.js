@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9348.1017.72', date: '2026-11-13'},
+  version: {number: '1.6805.1126.18', date: '2026-11-13'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -160,9 +160,10 @@ window.SITE = {
         meta: {en: 'Castle display with minifigures', zh: '城堡展示，附人偶'},
         caption: {en: 'A castle display built from LEGO, with colorful stars and minifigures.', zh: '以樂高組成的城堡展示，點綴著彩色星星與人偶。'}}
      ]},
-    {id: 'model-car', land: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '收藏我喜歡的車款，以比例模型呈現。'},
+    {id: 'model-car', land: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '歡迎光臨馬修車庫！'},
      /* Shown at the top of this collection. id is the part after v= in the video link. */
-     youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ'},
+     youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ',
+                channel: {id: 'UCHVu2xEPzSEkvoMBQZ6G0EQ', name: 'Matthew 馬修王'}},
      items: [
        {id: 'm1', drive: '1rOfobrD7KMJ6xhnYyhu5N_EnErQwyPye', wm: 1, title: {en: 'Alfa Romeo Giulia GTAm', zh: '愛快羅密歐 Giulia GTAm'}, meta: {en: 'BBR Models', zh: 'BBR Models'}},
        {id: 'm2', drive: '1a_i_R2ywCx-OksBl24e08J5zcdDYe6Db', wm: 1, title: {en: 'Aston Martin DB11, 007 Version', zh: '奧斯頓·馬丁 DB11，007 版'}, meta: {en: 'Autoart', zh: 'Autoart'}},
