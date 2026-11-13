@@ -497,7 +497,7 @@ function renderHome(){
       '<p class="big">'+esc(t('home_big'))+'</p>' + roleList() +
       '<div class="cta"><a class="btn solid" href="photography.html">'+esc(t('cta_photo'))+'</a><a class="btn line" href="about.html">'+esc(t('cta_about'))+'</a></div>' +
     '</div>' +
-    '<figure class="film"><img src="matthew-portrait.jpg" width="1200" height="1500" alt="'+esc(t('portrait_alt'))+'">' +
+    '<figure class="film"><img src="Claude_home_portrait.jpg" width="1200" height="1500" alt="'+esc(t('portrait_alt'))+'">' +
       '<div class="ann tl">'+esc(L(P.name))+'\n'+esc(L(P.short))+'</div><div class="ann tr" id="clock"></div>' +
       '<div class="ann bl">'+esc(t('ann_bl'))+'</div><div class="ann br">'+esc(t('ann_br'))+'</div></figure>' +
   '</section></div>' +
