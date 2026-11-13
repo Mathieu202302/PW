@@ -477,6 +477,14 @@ function initHero(H){
     if(dy > 0 && y < T - 1) heroGo(T);
     else if(dy < 0 && y > 0 && y <= T + 1) heroGo(0);
   }, {passive:true});
+  /* Coasting back up (a flick, trackpad momentum, a dragged scrollbar): as soon as the opening picture comes into view, glide to the very top. */
+  var lastY = scrollY;
+  addEventListener('scroll', function(){
+    var y = scrollY, prev = lastY; lastY = y;
+    if(!$('#hero') || heroBusy) return;
+    var T = heroTarget();
+    if(prev >= T - 1 && y < T - 1 && y > 0) heroGo(0);
+  }, {passive:true});
   addEventListener('keydown', function(e){
     if(!$('#hero') || e.altKey || e.ctrlKey || e.metaKey) return;
     var tg = e.target && e.target.tagName; if(tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT' || (e.target && e.target.isContentEditable)) return;
