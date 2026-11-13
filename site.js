@@ -371,7 +371,8 @@ function writeWelcome(cv, instant){
   img.onerror = function(){ cv.parentNode.classList.add('plain'); };
   img.src = 'welcome-write.png';
 }
-function heroTarget(){ var s = $('#start'); return s ? Math.round(s.getBoundingClientRect().top + scrollY - $('#top').offsetHeight) : 0; }
+/* Where one scroll down lands: the opening picture has gone completely (no part of it, or its Tokyo caption, shows through the top bar). */
+function heroTarget(){ var s = $('#start'); return s ? Math.round(s.getBoundingClientRect().top + scrollY) : 0; }
 var heroBusy = false, heroTimer = 0;
 function heroGo(y){
   heroBusy = true; clearTimeout(heroTimer);
