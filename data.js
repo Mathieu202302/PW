@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.4472.1208.65', date: '2026-11-13'},
+  version: {number: '1.7239.1311.84', date: '2026-11-13'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -112,8 +112,8 @@ window.SITE = {
        title: {en: 'Blue dial', zh: '藍色錶盤'},
        caption: {en: 'A blue-dial watch on a leather strap.', zh: '皮革錶帶搭配藍色錶盤的手錶。'}},
       {id: 'p3442', album: 'pets', drive: '1FV8L5YFYZ64YrTj7tf10PLRaidNHum5C', orig: '1slvGdb6p1yrNsNd2IKFC9KWKYxtGw7OS', wm: 1, w: 1600, h: 1067,
-       title: {en: 'Olaf resting', zh: 'Olaf 小憩片刻'},
-       caption: {en: 'Olaf lying down on a patch of dirt.', zh: 'Olaf 趴在一塊泥土地上休息。'}},
+       title: {en: 'Olaf on the lookout', zh: 'Olaf 在張望'},
+       caption: {en: 'Olaf standing on a patch of dirt, looking at something.', zh: 'Olaf 站在一小片泥土地上，正望著什麼東西。'}},
       {id: 'p4236', album: 'city', drive: '1dS0bEFjuWwHGQeye9N1swhfaF0N5dc8B', orig: '1aMPYowkMCvtT56EBsqFZ3M8bVvK1xb-L', wm: 1, w: 1600, h: 1067,
        title: {en: 'Dusk glow', zh: '暮色'},
        caption: {en: 'Dusk sky behind a lit modern building.', zh: '暮色天空下，一棟亮著燈的現代建築。'}},
