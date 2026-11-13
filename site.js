@@ -658,7 +658,7 @@ function renderAbout(){
   main.innerHTML = '<div class="shell">' + pageHead(t('about_h'), t('about_p')) +
   '<figure class="wide"><img src="matthew-wide.jpg" width="1920" height="1080" alt="'+esc(t('wide_alt'))+'"></figure>' +
   '<div class="about-grid"><div><h2 class="display" style="font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1">'+esc(t('about_hi'))+'</h2></div><div class="about-text">' +
-    '<p>'+esc(t('about_p1'))+'</p><p>'+esc(t('about_p2'))+'</p>' + roleList() + '<p>'+esc(t('about_p3'))+'</p>' +
+    '<p>'+esc(t('about_p1'))+'</p><p>'+esc(t('about_p2'))+'</p><p>'+esc(t('about_p2b'))+'</p>' + roleList() + '<p>'+esc(t('about_p3'))+'</p>' +
     '<dl class="facts"><div><dt>'+esc(t('f_grew'))+'</dt><dd>'+esc(t('v_grew'))+'</dd></div><div><dt>'+esc(t('f_lives'))+'</dt><dd>'+esc(L(P.location))+'</dd></div>' +
     '<div><dt>'+esc(t('f_study'))+'</dt><dd>'+esc(t('v_study'))+'</dd></div><div><dt>'+esc(t('f_grad'))+'</dt><dd>'+esc(t('v_grad'))+'</dd></div>' +
     '<div><dt>'+esc(t('f_into'))+'</dt><dd>'+esc(t('v_into'))+'</dd></div></dl>' +
