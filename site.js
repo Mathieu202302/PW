@@ -624,7 +624,7 @@ function renderCollections(){
     $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
       lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), wm:!!it.wm, title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
-      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid">' +
+      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid'+(c.land ? ' land' : '')+'">' +
         c.items.map(function(it, i){
           return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
             '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +

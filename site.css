@@ -202,6 +202,8 @@ h1:focus{outline:none}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;padding-bottom:40px}
 .grid .tile{margin:0;aspect-ratio:4/5}
 .grid .tile img{height:100%;object-fit:cover}
+.grid.land{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.grid.land .tile{aspect-ratio:16/9}
 .coll-sec{padding:8px 0 24px}
 .coll-sec+.coll-sec{border-top:1px solid var(--rule);padding-top:40px;margin-top:16px}
 .coll-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;margin-bottom:20px}
