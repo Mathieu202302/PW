@@ -371,8 +371,7 @@ function writeWelcome(cv, instant){
   img.onerror = function(){ cv.parentNode.classList.add('plain'); };
   img.src = 'welcome-write.png';
 }
-/* Where one scroll down lands: the opening picture has gone completely (no part of it, or its Tokyo caption, shows through the top bar). */
-function heroTarget(){ var s = $('#start'); return s ? Math.round(s.getBoundingClientRect().top + scrollY) : 0; }
+function heroTarget(){ var s = $('#start'); return s ? Math.round(s.getBoundingClientRect().top + scrollY - $('#top').offsetHeight) : 0; }
 var heroBusy = false, heroTimer = 0;
 function heroGo(y){
   heroBusy = true; clearTimeout(heroTimer);
@@ -477,14 +476,6 @@ function initHero(H){
     if(Math.abs(dy) < 30) return;
     if(dy > 0 && y < T - 1) heroGo(T);
     else if(dy < 0 && y > 0 && y <= T + 1) heroGo(0);
-  }, {passive:true});
-  /* Coasting back up (a flick, trackpad momentum, a dragged scrollbar): as soon as the opening picture comes into view, glide to the very top. */
-  var lastY = scrollY;
-  addEventListener('scroll', function(){
-    var y = scrollY, prev = lastY; lastY = y;
-    if(!$('#hero') || heroBusy) return;
-    var T = heroTarget();
-    if(prev >= T - 1 && y < T - 1 && y > 0) heroGo(0);
   }, {passive:true});
   addEventListener('keydown', function(e){
     if(!$('#hero') || e.altKey || e.ctrlKey || e.metaKey) return;
