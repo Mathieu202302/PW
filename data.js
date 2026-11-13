@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.8271.904.36', date: '2026-11-13'},
+  version: {number: '1.9348.1017.72', date: '2026-11-13'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -192,7 +192,7 @@ window.SITE = {
        {id: 'm26', drive: '1GJgKzV5vhfQp-0vM0gnCfVtjlNbGfJRt', wm: 1, title: {en: 'Porsche 911 GT3 RS', zh: '保時捷 911 GT3 RS'}, meta: {en: 'Make Up Models', zh: 'Make Up Models'}},
        {id: 'm27', drive: '1YHMREVJsiKLc3hgI8VvsqqcdMrU8E6tH', wm: 1, title: {en: 'Porsche 911 Dakar', zh: '保時捷 911 Dakar'}, meta: {en: 'Porsche', zh: 'Porsche'}},
        {id: 'm28', drive: '1gdwGnqdLTw16RHs__nSrUdcpDT_SCvp5', wm: 1, title: {en: 'Rolls-Royce Cullinan, Richie Rich Version', zh: '勞斯萊斯 Cullinan，Richie Rich 版'}, meta: {en: 'Henson and Heaven Models', zh: 'Henson and Heaven Models'}},
-       {id: 'm29', drive: '1sNaXo_mBQ53uqArlPKtVWCDch-UssFge', wm: 1, title: {en: 'Tesla Cybertruck', zh: '特斯拉 Cybertruck'}, meta: {en: 'Scale model', zh: '比例模型'}}
+       {id: 'm29', drive: '1sNaXo_mBQ53uqArlPKtVWCDch-UssFge', wm: 1, title: {en: 'Tesla Cybertruck', zh: '特斯拉 Cybertruck'}, meta: {en: 'Tesla', zh: 'Tesla'}}
      ]}
   ],
 
