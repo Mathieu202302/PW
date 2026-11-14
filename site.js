@@ -638,7 +638,7 @@ function renderCollections(){
       lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), wm:!!it.wm, title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
       return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid'+(c.land ? ' land' : '')+'">' +
         c.items.map(function(it, i){
-          return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
+          return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+(it.w && it.h && it.w > it.h && !c.land ? ' wide' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
             '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
             '<span class="cap"><b>'+esc(L(it.title))+'</b><span>'+esc(L(it.meta))+'</span></span>' + (hasImg(it) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
         }).join('') + '</div></section>';

@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.8516.1403.29', date: '2026-11-13'},
+  version: {number: '1.5903.1519.46', date: '2026-11-13'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -158,7 +158,11 @@ window.SITE = {
        {id: 'l1', drive: '1ewMaiAE60x7Unr2zTsex0XIA-2t6Ba0x', orig: '1hKA481EY6_se5KQP57ZNuEtaRkAGH6rG', wm: 1, w: 1600, h: 2400,
         title: {en: 'My Disney Display', zh: '我的迪士尼展示'},
         meta: {en: 'Disney castle with plenty of minifigures', zh: '迪士尼城堡與滿滿的人偶'},
-        caption: {en: 'Fireworks and a dragon! A whole fantasy land.', zh: '煙火與巨龍！一整片奇幻世界。'}}
+        caption: {en: 'Fireworks and a dragon! A whole fantasy land.', zh: '煙火與巨龍！一整片奇幻世界。'}},
+       {id: 'l2', drive: '1YoDPIZqAMuOGCk7eUaqKdFyavn8niXuz', orig: '1m5CPOQewaAkauo7CbIMlnWaFuu3MLcu-', wm: 1, w: 3200, h: 2400,
+        title: {en: 'Popcorn Wagon', zh: '爆米花車'},
+        meta: {en: 'BrickLink Designer Program, Series 5', zh: 'BrickLink 設計師計畫 第 5 系列'},
+        caption: {en: 'BrickLink 910052 Popcorn Wagon, with its little customers and a street lamp.', zh: 'BrickLink 910052 爆米花車，還有小小顧客與一盞街燈。'}}
      ]},
     {id: 'model-car', land: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: 'Scale models of cars I like.', zh: '歡迎光臨馬修車庫！'},
      /* Shown at the top of this collection. id is the part after v= in the video link. */
