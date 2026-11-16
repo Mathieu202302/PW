@@ -388,9 +388,9 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 .yt h3{font:700 1.3rem/1.25 var(--display);font-stretch:108%;letter-spacing:-.01em}
 .yt p{margin-top:8px;color:var(--graphite);font-size:1.02rem;max-width:34ch}
 .yt .btn{margin-top:18px}
-.yt-chan .yt-id{display:flex;align-items:center;gap:14px;margin-top:16px}
-.yt-chan .yt-id b{font:700 1.1rem/1.25 var(--display);letter-spacing:-.005em}
-.yt-av{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--rule);flex:none}
+.yt-chan .yt-id{display:flex;align-items:center;gap:18px;margin-top:18px}
+.yt-chan .yt-id b{font:700 1.7rem/1.2 var(--display);letter-spacing:-.01em}
+.yt-av{width:104px;height:104px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--rule);flex:none}
 .yt-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .yt-acts .btn{margin-top:0}
 .yt .btn.yt-sub{background:#cc0000;border-color:#cc0000;color:#fff}
