@@ -590,9 +590,9 @@ function youtubeHTML(y, hKey, pKey){
   if(ch && ch.id){
     var base = 'https://www.youtube.com/channel/' + encodeURIComponent(ch.id);
     copy = '<div class="yt-copy yt-chan"><h3>'+esc(t(hKey || 'yt_h'))+'</h3>' +
-      '<div class="yt-id"><img class="yt-av" src="icon-192.png" alt="" width="104" height="104"><b>'+esc(ch.name)+'</b></div>' +
+      '<div class="yt-card"><img class="yt-av" src="icon-192.png" alt="" width="104" height="104"><div class="yt-meta"><b>'+esc(ch.name)+'</b>' +
       '<div class="yt-acts"><a class="btn yt-sub" href="'+base+'?sub_confirmation=1" target="_blank" rel="noopener noreferrer">'+esc(t('yt_sub'))+'</a>' +
-      '<a class="btn line" href="'+base+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_visit'))+'</a></div></div>';
+      '<a class="btn line" href="'+base+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_visit'))+'</a></div></div></div></div>';
   } else {
     copy = '<div class="yt-copy"><h3>'+esc(t(hKey || 'yt_h'))+'</h3><p>'+esc(t(pKey || 'yt_p'))+'</p>' +
       '<a class="btn solid" href="'+esc(y.url)+'" target="_blank" rel="noopener noreferrer">'+esc(t('yt_watch'))+'</a></div>';
