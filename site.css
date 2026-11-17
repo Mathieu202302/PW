@@ -431,6 +431,7 @@ html.standalone,html.standalone body{overscroll-behavior-y:none}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
 
 .shop{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 28px;margin:0 0 28px;padding:20px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.grid + .shop{margin:8px 0 48px}
 .shop h3{font:700 1.3rem/1.25 var(--display);font-stretch:108%;letter-spacing:-.01em}
 .shop p{margin-top:6px;color:var(--graphite);font-size:1.02rem}
 html[lang="zh-Hant-TW"] .shop h3{letter-spacing:0}
