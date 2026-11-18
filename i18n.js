@@ -52,8 +52,8 @@ en: {
   st_ok: 'Sent. Thank you, I will get back to you soon.', st_fail: 'Your message did not send. Please try again in a moment.',
   st_net: 'Your message did not send. Check your connection and try again.',
   meta_desc: 'Matthew Wang: photography, collections, career and about me.',
-  title_home: 'Matthew Wang', title_photography: 'Photography, Matthew Wang', title_collections: 'Collections, Matthew Wang',
-  title_life: 'My life, Matthew Wang', title_career: 'Career, Matthew Wang', title_about: 'About me, Matthew Wang', title_contact: 'Send me a message, Matthew Wang'
+  title_home: 'Matthew\'s', title_photography: 'Photography | Matthew\'s', title_collections: 'Collections | Matthew\'s',
+  title_life: 'My life | Matthew\'s', title_career: 'Career | Matthew\'s', title_about: 'About me | Matthew\'s', title_contact: 'Send me a message | Matthew\'s'
 },
 zh: {
   skip: '跳到主要內容', menu: '選單', nav_main: '主選單', lang_group: '語言',
