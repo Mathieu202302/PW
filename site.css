@@ -390,12 +390,13 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 .yt h3{font:700 1.1rem/1.3 var(--display);letter-spacing:0}
 .yt p{margin-top:8px;color:var(--graphite);font-size:1.02rem;max-width:34ch}
 .yt .btn{margin-top:18px}
-.yt-card{display:flex;align-items:center;gap:20px;margin-top:18px}
+.yt-card{display:flex;align-items:center;gap:20px}
 .yt-meta{display:flex;flex-direction:column;align-items:flex-start;gap:14px;min-width:0}
 .yt-meta b{font:700 1.7rem/1.2 var(--display);letter-spacing:-.01em}
 .yt-av{width:104px;height:104px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--rule);flex:none}
-.yt-acts{display:flex;flex-wrap:wrap;gap:10px}
-.yt-acts .btn{margin-top:0}
+/* the two buttons are always the same width: side by side when there is room, stacked when there is not */
+.yt-acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:10px;width:100%}
+.yt-acts .btn{margin-top:0;text-align:center;white-space:nowrap}
 .yt .btn.yt-sub{background:#cc0000;border-color:#cc0000;color:#fff}
 .yt .btn.yt-sub:hover,.yt .btn.yt-sub:focus-visible{background:#a30000;border-color:#a30000}
 .yt-note{display:block;margin-top:12px;color:var(--graphite);font-size:.82rem;line-height:1.4;max-width:34ch}
@@ -416,7 +417,7 @@ html[lang="zh-Hant-TW"] .note{max-width:16em}
 .yt-play:hover .yt-btn::before,.yt-play:focus-visible .yt-btn::before,.tile.video:hover .vbadge::before,.tile.video:focus-visible .vbadge::before{border-left-color:var(--film)}
 .tile.video{background:var(--film)}
 .tile.video img{height:100%;object-fit:cover}
-@media (max-width:860px){.yt{grid-template-columns:1fr;gap:20px;padding:20px 0 24px}.yt-chan{text-align:center}.yt-card{flex-direction:column;gap:14px}.yt-meta{align-items:center}.yt-acts{justify-content:center}}
+@media (max-width:860px){.yt{grid-template-columns:1fr;gap:20px;padding:20px 0 24px}.yt-chan{text-align:center}.yt-card{flex-direction:column;gap:14px}.yt-meta{align-items:center;width:100%}.yt-acts{max-width:340px;margin:0 auto}}
 html[lang="zh-Hant-TW"] .yt h3,html[lang="zh-Hant-TW"] .yt .feat-t{letter-spacing:0}
 html[lang="zh-Hant-TW"] .yt p{max-width:28em}
 
