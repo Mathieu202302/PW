@@ -681,12 +681,17 @@ function renderCollections(){
     if(!(e.target.closest && e.target.closest('.az'))) azSet(false);
   });
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') azSet(false); });
-  var swipeX = null;
-  main.addEventListener('touchstart', function(e){ swipeX = (e.target.closest && e.target.closest('.az')) ? e.touches[0].clientX : null; }, {passive:true});
+  /* a sideways swipe anywhere over the model car photos pulls the list out (right) or tucks it away (left) */
+  var swipe = null;
+  main.addEventListener('touchstart', function(e){
+    var tb = main.querySelector('.az-tab');
+    swipe = (tb && getComputedStyle(tb).display !== 'none' && e.touches.length === 1 && e.target.closest && e.target.closest('.az-wrap')) ? {x: e.touches[0].clientX, y: e.touches[0].clientY} : null;
+  }, {passive:true});
   main.addEventListener('touchmove', function(e){
-    if(swipeX === null) return;
-    var dx = e.touches[0].clientX - swipeX;
-    if(dx > 24){ azSet(true); swipeX = null; } else if(dx < -24){ azSet(false); swipeX = null; }
+    if(!swipe) return;
+    var dx = e.touches[0].clientX - swipe.x, dy = e.touches[0].clientY - swipe.y;
+    if(Math.abs(dx) < 36 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    azSet(dx > 0); swipe = null;
   }, {passive:true});
   main.addEventListener('click', function(e){
     var tb = e.target.closest ? e.target.closest('.az-tab') : null;
