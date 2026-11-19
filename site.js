@@ -654,7 +654,7 @@ function renderCollections(){
         var az = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function(ch){
           return '<button type="button" class="az-l" data-l="'+ch+'"'+(have[ch] ? '' : ' disabled')+'>'+ch+'</button>';
         }).join('');
-        body = '<div class="az-wrap"><nav class="az" aria-label="'+esc(t('az_aria'))+'">'+az+'</nav><div class="az-body">' +
+        body = '<div class="az-wrap"><nav class="az" aria-label="'+esc(t('az_aria'))+'"><button type="button" class="az-tab" aria-expanded="false" aria-controls="az-list"><span>A–Z</span></button><div class="az-list" id="az-list">'+az+'</div></nav><div class="az-body">' +
           names.map(function(k){
             return '<div class="brand-grp" data-l="'+esc(k.charAt(0).toUpperCase())+'"><h3 class="brand-h">'+esc(labels[k])+'</h3><div class="grid land mc">'+groups[k].join('')+'</div></div>';
           }).join('') + '</div></div>';
@@ -670,9 +670,30 @@ function renderCollections(){
     var tile = e.target.closest('.tile'); if(!tile) return;
     openLB(lists[tile.getAttribute('data-c')], parseInt(tile.getAttribute('data-i'), 10), tile);
   });
+  /* On small screens the A to Z list is tucked away: tap the tab (or swipe it right) to pull it out. */
+  function azSet(open){
+    var nav = main.querySelector('.az'); if(!nav) return;
+    nav.classList.toggle('open', open);
+    var tb = nav.querySelector('.az-tab'); if(tb) tb.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  document.addEventListener('click', function(e){
+    var nav = main.querySelector('.az'); if(!nav || !nav.classList.contains('open')) return;
+    if(!(e.target.closest && e.target.closest('.az'))) azSet(false);
+  });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') azSet(false); });
+  var swipeX = null;
+  main.addEventListener('touchstart', function(e){ swipeX = (e.target.closest && e.target.closest('.az')) ? e.touches[0].clientX : null; }, {passive:true});
+  main.addEventListener('touchmove', function(e){
+    if(swipeX === null) return;
+    var dx = e.touches[0].clientX - swipeX;
+    if(dx > 24){ azSet(true); swipeX = null; } else if(dx < -24){ azSet(false); swipeX = null; }
+  }, {passive:true});
   main.addEventListener('click', function(e){
+    var tb = e.target.closest ? e.target.closest('.az-tab') : null;
+    if(tb){ azSet(!tb.closest('.az').classList.contains('open')); return; }
     var b = e.target.closest ? e.target.closest('.az-l') : null;
     if(!b || b.disabled) return;
+    azSet(false);
     var g = main.querySelector('.brand-grp[data-l="'+b.getAttribute('data-l')+'"]');
     if(!g) return;
     var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

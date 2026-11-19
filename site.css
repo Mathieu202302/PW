@@ -446,7 +446,10 @@ body[data-page="photography"] .page-head p{max-width:none;white-space:pre-line;f
 
 /* ---------- model car: A to Z index and manufacturer groups ---------- */
 .az-wrap{display:grid;grid-template-columns:26px minmax(0,1fr);gap:22px;align-items:start}
-.az{position:sticky;top:calc(var(--hdr,59px) + 16px);display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:min(calc(100vh - var(--hdr,59px) - 40px),560px);height:min(calc(100dvh - var(--hdr,59px) - 40px),560px)}
+.az-wrap{--az-h:min(calc(100vh - var(--hdr,59px) - 40px),560px);--az-h:min(calc(100dvh - var(--hdr,59px) - 40px),560px)}
+.az{position:sticky;top:calc(var(--hdr,59px) + 16px);height:var(--az-h)}
+.az-list{display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%}
+.az-tab{display:none}
 .az-l{flex:1 1 0;min-height:0;width:26px;padding:0;border:0;background:transparent;font:600 .78rem/1 var(--display);letter-spacing:.02em;color:var(--ink);cursor:pointer;border-radius:4px}
 .az-l:hover{color:var(--teal)}
 .az-l:disabled{color:var(--graphite);opacity:.4;cursor:default}
@@ -458,4 +461,15 @@ body[data-page="photography"] .page-head p{max-width:none;white-space:pre-line;f
 .grid.land.mc{grid-template-columns:minmax(0,1fr);padding-bottom:36px}
 @media (min-width:480px){.grid.land.mc{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:900px){.grid.land.mc{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:480px){.az-wrap{gap:14px}}
+/* small screens (phones, and phones turned sideways): the list hides at the left edge and pulls out on demand */
+@media (max-width:600px),(max-height:520px){
+  .az-wrap{display:block}
+  .az{width:0;margin-bottom:calc(-1 * var(--az-h));z-index:30}
+  .az-tab{display:flex;align-items:center;justify-content:center;position:absolute;left:-20px;top:calc(var(--az-h) / 2 - 40px);width:20px;height:80px;padding:0;border:1px solid var(--rule);border-left:0;border-radius:0 10px 10px 0;background:var(--paper-2);color:var(--ink);cursor:pointer;box-shadow:2px 0 8px rgba(0,0,0,.12);transition:opacity .2s,transform .25s}
+  .az-tab span{writing-mode:vertical-rl;font:700 .7rem/1 var(--display);letter-spacing:.06em}
+  .az.open .az-tab{opacity:0;pointer-events:none;transform:translateX(-100%)}
+  .az-list{position:absolute;left:-20px;top:0;width:48px;padding:8px 0;background:var(--paper);border:1px solid var(--rule);border-left:0;border-radius:0 12px 12px 0;box-shadow:4px 0 18px rgba(0,0,0,.22);transform:translateX(-110%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+  .az.open .az-list{transform:none;visibility:visible;transition:transform .25s ease,visibility 0s}
+  .az-l{width:48px}
+}
+@media (prefers-reduced-motion:reduce){.az-tab,.az-list{transition:none!important}}
