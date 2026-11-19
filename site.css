@@ -442,3 +442,19 @@ html[lang="zh-Hant-TW"] .shop h3{letter-spacing:0}
 
 /* Photography page: the subtitle lists the camera and lenses, one per line */
 body[data-page="photography"] .page-head p{max-width:none;white-space:pre-line;font-size:1.1rem;line-height:1.6}
+
+/* ---------- model car: A to Z index and manufacturer groups ---------- */
+.az-wrap{display:grid;grid-template-columns:26px minmax(0,1fr);gap:22px;align-items:start}
+.az{position:sticky;top:calc(var(--hdr,59px) + 16px);display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:min(calc(100vh - var(--hdr,59px) - 40px),560px);height:min(calc(100dvh - var(--hdr,59px) - 40px),560px)}
+.az-l{flex:1 1 0;min-height:0;width:26px;padding:0;border:0;background:transparent;font:600 .78rem/1 var(--display);letter-spacing:.02em;color:var(--ink);cursor:pointer;border-radius:4px}
+.az-l:hover{color:var(--teal)}
+.az-l:disabled{color:var(--graphite);opacity:.4;cursor:default}
+.az-l:disabled:hover{color:var(--graphite)}
+.brand-grp{scroll-margin-top:0}
+/* the last manufacturer gets enough room to reach the top of the screen, so the index never gets pushed away */
+.brand-grp:last-child{min-height:min(calc(100vh - var(--hdr,59px) - 40px),560px);min-height:min(calc(100dvh - var(--hdr,59px) - 40px),560px)}
+.brand-h{font:700 1.3rem/1.2 var(--display);letter-spacing:-.01em;margin:0 0 14px;padding-top:2px}
+.grid.land.mc{grid-template-columns:minmax(0,1fr);padding-bottom:36px}
+@media (min-width:480px){.grid.land.mc{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.grid.land.mc{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:480px){.az-wrap{gap:14px}}

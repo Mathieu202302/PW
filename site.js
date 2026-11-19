@@ -634,12 +634,34 @@ function renderCollections(){
     $('#count').textContent = t('coll_count', shown.length, n);
     $('#colls').innerHTML = shown.map(function(c){
       lists[c.id] = c.items.map(function(it){ return {src:srcOf(it, 2000), thumb:srcOf(it, 160), wm:!!it.wm, title:L(it.title), note:it.caption ? L(it.caption) : '', meta:L(c.name) + (lang === 'zh' ? '，' : ', ') + L(it.meta)}; });
-      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.youtube ? youtubeHTML(c.youtube) : '') + '<div class="grid'+(c.land ? ' land' : '')+'">' +
-        c.items.map(function(it, i){
-          return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+(it.w && it.h && it.w > it.h && !c.land ? ' wide' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
-            '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
-            '<span class="cap"><b>'+esc(L(it.title))+'</b><span>'+esc(L(it.meta))+'</span></span>' + (hasImg(it) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
-        }).join('') + '</div>' + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + '</section>';
+      function tileHTML(it, i, noMeta){
+        return '<button type="button" class="tile'+(it.wm ? ' wmd' : '')+(it.w && it.h && it.w > it.h && !c.land ? ' wide' : '')+'" data-c="'+c.id+'" data-i="'+i+'" aria-label="'+esc(t('open_item', L(it.title)))+'">' +
+          '<img src="'+srcOf(it, 800)+'" alt="'+esc(it.caption ? L(it.caption) : L(it.title))+'" loading="lazy" referrerpolicy="no-referrer">' +
+          '<span class="cap"><b>'+esc(L(it.title))+'</b>'+(noMeta ? '' : '<span>'+esc(L(it.meta))+'</span>')+'</span>' + (hasImg(it) ? '' : '<span class="ph">'+esc(t('placeholder'))+'</span>') + '</button>';
+      }
+      var body;
+      if(c.alpha){
+        /* A to Z index on the left, items grouped under their manufacturer (the item's meta). */
+        var groups = {}, names = [];
+        c.items.forEach(function(it, i){
+          var k = L(it.meta);
+          if(!groups[k]){ groups[k] = []; names.push(k); }
+          groups[k].push(tileHTML(it, i, true));
+        });
+        names.sort(function(a, b){ return a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0; });
+        var have = {};
+        names.forEach(function(k){ var ch = k.charAt(0).toUpperCase(); have[ch] = true; });
+        var az = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function(ch){
+          return '<button type="button" class="az-l" data-l="'+ch+'"'+(have[ch] ? '' : ' disabled')+'>'+ch+'</button>';
+        }).join('');
+        body = '<div class="az-wrap"><nav class="az" aria-label="'+esc(t('az_aria'))+'">'+az+'</nav><div class="az-body">' +
+          names.map(function(k){
+            return '<div class="brand-grp" data-l="'+esc(k.charAt(0).toUpperCase())+'"><h3 class="brand-h">'+esc(k)+'</h3><div class="grid land mc">'+groups[k].join('')+'</div></div>';
+          }).join('') + '</div></div>';
+      } else {
+        body = '<div class="grid'+(c.land ? ' land' : '')+'">' + c.items.map(function(it, i){ return tileHTML(it, i, false); }).join('') + '</div>';
+      }
+      return '<section class="coll-sec" aria-labelledby="h-'+c.id+'"><div class="coll-head"><h2 id="h-'+c.id+'">'+esc(L(c.name))+'</h2><p>'+esc(L(c.blurb))+'</p></div>' + (c.youtube ? youtubeHTML(c.youtube) : '') + body + (c.shop && c.shop.url ? shopHTML(c.shop) : '') + '</section>';
     }).join('');
   }
   $('#colls').addEventListener('error', function(e){ if(e.target.tagName === 'IMG') e.target.style.visibility = 'hidden'; }, true);
@@ -647,6 +669,14 @@ function renderCollections(){
     var yt = e.target.closest('.yt-play'); if(yt){ playYouTube(yt.parentNode); return; }
     var tile = e.target.closest('.tile'); if(!tile) return;
     openLB(lists[tile.getAttribute('data-c')], parseInt(tile.getAttribute('data-i'), 10), tile);
+  });
+  main.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.az-l') : null;
+    if(!b || b.disabled) return;
+    var g = main.querySelector('.brand-grp[data-l="'+b.getAttribute('data-l')+'"]');
+    if(!g) return;
+    var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    g.scrollIntoView({behavior: calm ? 'auto' : 'smooth', block: 'start'});
   });
   onHash(draw); draw();
 }

@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9150.5274.36', date: '2026-11-18'},
+  version: {number: '1.3377.6049.18', date: '2026-11-18'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -164,7 +164,7 @@ window.SITE = {
         meta: {en: 'BrickLink Designer Program, Series 5', zh: 'BrickLink 設計師計畫 第 5 系列'},
         caption: {en: 'BrickLink 910052 Popcorn Wagon, with its little customers and a street lamp.', zh: 'BrickLink 910052 爆米花車，還有小小顧客與一盞街燈。'}}
      ]},
-    {id: 'model-car', land: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: '1/18 high-end model cars. Contact me for buying options.', zh: '歡迎光臨馬修車庫！1/18 頂級品牌精品模型車，歡迎洽詢購買。'},
+    {id: 'model-car', land: 1, alpha: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: '1/18 high-end model cars. Contact me for buying options.', zh: '歡迎光臨馬修車庫！1/18 頂級品牌精品模型車，歡迎洽詢購買。'},
      /* Shown at the top of this collection. id is the part after v= in the video link. */
      youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ',
                 channel: {id: 'UCHVu2xEPzSEkvoMBQZ6G0EQ', name: 'Matthew 馬修王'}},
