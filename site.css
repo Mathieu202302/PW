@@ -73,6 +73,7 @@ h1:focus{outline:none}
 .caret:hover{color:var(--ink)}
 .sub{position:absolute;top:100%;left:0;z-index:50;min-width:220px;margin:0;padding:8px;list-style:none;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 22px 40px -20px rgba(6,9,10,.5);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility 0s .15s}
 .has-sub:hover>.sub,.has-sub:focus-within>.sub,.has-sub.open>.sub{opacity:1;visibility:visible;transform:none;transition:opacity .15s,transform .15s,visibility 0s 0s}
+@media (min-width:901px){.has-sub.dismissed:hover>.sub,.has-sub.dismissed:focus-within>.sub,.has-sub.dismissed.open>.sub{opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility 0s .15s}}
 .sub a{display:block;padding:9px 12px;border-radius:4px;font:500 .95rem var(--display);text-decoration:none}
 .sub a:hover,.sub a:focus-visible{background:var(--teal);color:var(--on-teal)}
 .menu-btn{display:none;margin-left:auto;background:transparent;border:1px solid var(--rule);border-radius:4px;padding:7px 12px;font:500 .9rem var(--display);cursor:pointer}

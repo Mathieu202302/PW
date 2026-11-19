@@ -189,10 +189,25 @@ function bindHeaderOnce(){
     var m = e.target.closest('.menu-btn'), c = e.target.closest('.caret'), g = e.target.closest('[data-lang]'), th = e.target.closest('.theme-btn');
     if(th){ THEME.toggle(); }
     else if(m){ var open = !h.classList.contains('open'); h.classList.toggle('open', open); m.setAttribute('aria-expanded', String(open)); }
-    else if(c){ e.stopPropagation(); var li = c.parentNode, o = !li.classList.contains('open'); closeSubs(li); li.classList.toggle('open', o); c.setAttribute('aria-expanded', String(o)); }
+    else if(c){ e.stopPropagation(); var li = c.parentNode, o = !li.classList.contains('open'); closeSubs(li); li.classList.remove('dismissed'); li.classList.toggle('open', o); c.setAttribute('aria-expanded', String(o)); }
     else if(g){ setLang(g.getAttribute('data-lang')); }
   });
   document.addEventListener('click', function(e){ if(!e.target.closest('.has-sub')) closeSubs(null); });
+  /* Choosing any link in the navigation closes its list (and the phone menu), even when it leads to the page you are already on. */
+  h.addEventListener('click', function(e){
+    var lk = e.target.closest ? e.target.closest('.nav a') : null; if(!lk) return;
+    closeSubs(null);
+    var li = lk.closest('.has-sub'); if(li) li.classList.add('dismissed');
+    if(h.classList.contains('open')){ h.classList.remove('open'); var mb = $('.menu-btn', h); if(mb) mb.setAttribute('aria-expanded', 'false'); }
+    if(lk.blur) lk.blur();
+  });
+  /* a closed list may open again once the pointer has left it or the keyboard comes back to it */
+  document.addEventListener('mouseover', function(e){
+    $$('.has-sub.dismissed', h).forEach(function(li){ if(!li.contains(e.target)) li.classList.remove('dismissed'); });
+  });
+  h.addEventListener('focusin', function(e){
+    $$('.has-sub.dismissed', h).forEach(function(li){ li.classList.remove('dismissed'); });
+  });
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
       closeSubs(null);
