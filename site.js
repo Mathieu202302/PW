@@ -641,12 +641,12 @@ function renderCollections(){
       }
       var body;
       if(c.alpha){
-        /* A to Z index on the left, items grouped under their manufacturer (the item's meta). */
-        var groups = {}, names = [];
+        /* A to Z index on the left, items grouped under their car brand (the item's brand, e.g. Ferrari). */
+        var groups = {}, names = [], labels = {};
         c.items.forEach(function(it, i){
-          var k = L(it.meta);
-          if(!groups[k]){ groups[k] = []; names.push(k); }
-          groups[k].push(tileHTML(it, i, true));
+          var k = it.brand ? it.brand.en : it.meta.en;
+          if(!groups[k]){ groups[k] = []; labels[k] = it.brand ? (lang === 'zh' && it.brand.zh ? it.brand.zh + ' ' + k : k) : L(it.meta); names.push(k); }
+          groups[k].push(tileHTML(it, i, false));
         });
         names.sort(function(a, b){ return a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0; });
         var have = {};
@@ -656,7 +656,7 @@ function renderCollections(){
         }).join('');
         body = '<div class="az-wrap"><nav class="az" aria-label="'+esc(t('az_aria'))+'">'+az+'</nav><div class="az-body">' +
           names.map(function(k){
-            return '<div class="brand-grp" data-l="'+esc(k.charAt(0).toUpperCase())+'"><h3 class="brand-h">'+esc(k)+'</h3><div class="grid land mc">'+groups[k].join('')+'</div></div>';
+            return '<div class="brand-grp" data-l="'+esc(k.charAt(0).toUpperCase())+'"><h3 class="brand-h">'+esc(labels[k])+'</h3><div class="grid land mc">'+groups[k].join('')+'</div></div>';
           }).join('') + '</div></div>';
       } else {
         body = '<div class="grid'+(c.land ? ' land' : '')+'">' + c.items.map(function(it, i){ return tileHTML(it, i, false); }).join('') + '</div>';
