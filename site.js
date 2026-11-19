@@ -893,7 +893,7 @@ function mergeGroup(base, feed, album, albums, label){
     if(album === 'photo' || album === 'life') it.album = f.a; else it.meta = label || {en:'', zh:''};
     return it;
   });
-  var kept = base.filter(function(b){ return !b.drive || inFeed[b.orig || b.drive]; }).map(function(b){
+  var kept = base.filter(function(b){ return !b.drive || b.keep || inFeed[b.orig || b.drive]; }).map(function(b){
     var fi = inFeed[b.orig || b.drive];
     if(b.drive && fi && (album === 'photo' || album === 'life') && fi.a !== b.album){ var c = {}; for(var k in b) c[k] = b[k]; c.album = fi.a; return c; }
     return b;
