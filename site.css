@@ -234,9 +234,16 @@ h1:focus{outline:none}
 .lb-top output{color:var(--amber);font-variant-numeric:tabular-nums}
 .lb-btn{background:transparent;border:1px solid var(--film-line);border-radius:4px;color:#fff;padding:8px 14px;font:500 .9rem var(--display);cursor:pointer}
 .lb-btn:hover{border-color:var(--amber)}
-.lb-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 64px;touch-action:pan-y}
-.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:2px;user-select:none;-webkit-user-select:none}
-.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;padding:0;font-size:1.3rem;line-height:1}
+.lb-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 64px;touch-action:none;overflow:hidden}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:2px;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;cursor:zoom-in;transform-origin:50% 50%;will-change:transform}
+.lb-stage.zoomed img{cursor:grab}
+.lb-stage.zoomed img:active{cursor:grabbing}
+.lb-stage img.zanim{transition:transform .22s ease}
+.lb-tools{display:flex;align-items:center;gap:8px}
+.lb-zoom{display:flex;gap:8px}
+.lb-zoom[hidden]{display:none}
+.lb-zoom .lb-btn{min-width:40px;padding:8px 0;font-size:1.05rem;line-height:1}
+.lb-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;padding:0;font-size:1.3rem;line-height:1}
 .lb-nav.prev{left:12px}.lb-nav.next{right:12px}
 .lb-cap{padding:10px 20px 6px;text-align:center;color:#fff;font:600 1rem var(--display)}
 .lb-cap span{display:block;margin-top:2px;font:500 .85rem var(--display);color:var(--film-text)}
