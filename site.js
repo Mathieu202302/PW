@@ -652,14 +652,27 @@ function playYouTube(box){
 }
 function renderCollections(){
   main.innerHTML = '<div class="shell">' + pageHead(t('coll_h'), t('coll_p')) +
-    '<nav class="chips" id="chips" aria-label="'+esc(t('colls_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div id="colls"></div><div style="height:48px"></div></div>';
-  var lists = {};
+    '<nav class="chips" id="chips" aria-label="'+esc(t('colls_aria'))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="albums two" id="collcards"></div><div id="colls"></div><div style="height:48px"></div></div>';
+  var lists = {}, prevH = null;
   function draw(){
     var h = location.hash.slice(1) || 'all';
     if(h !== 'all' && !S.collections.some(function(c){ return c.id === h; })) h = 'all';
-    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(S.collections).map(function(c){
+    $('#chips').innerHTML = [{id:'all', name:t('all_collections')}].concat(S.collections).map(function(c){
       return '<a class="chip" href="#'+c.id+'" aria-current="'+(c.id === h)+'">'+esc(L(c.name))+'</a>';
     }).join('');
+    var overview = h === 'all', cards = $('#collcards');
+    if(prevH !== null && prevH !== h) window.scrollTo(0, 0);
+    prevH = h; cards.hidden = !overview; $('#colls').hidden = overview;
+    if(overview){
+      $('#colls').innerHTML = '';
+      $('#count').textContent = t('coll_cards_count', S.collections.length);
+      cards.innerHTML = S.collections.map(function(c){
+        var cv = c.items.filter(function(it){ return it.id === c.cover; })[0] || c.items[0];
+        return '<a class="album" href="#'+c.id+'">' + (cv ? '<img src="'+srcOf(cv, 1200)+'" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') +
+          '<span class="album-cap"><b>'+esc(L(c.name))+'</b><span>'+esc(t('item_count', c.items.length))+'</span></span></a>';
+      }).join('');
+      return;
+    }
     var shown = S.collections.filter(function(c){ return h === 'all' || c.id === h; });
     var n = shown.reduce(function(sum, c){ return sum + c.items.length; }, 0);
     $('#count').textContent = t('coll_count', shown.length, n);
