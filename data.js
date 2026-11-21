@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9325.61843095.728401536', date: '2026-11-21'},
+  version: {number: '1.9328.739150264.5186402917', date: '2026-11-21'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
