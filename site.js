@@ -144,7 +144,7 @@ function renderHeader(){
   var h = $('#top'), isOpen = h.classList.contains('open');
   var NAV = [
     {key:'photography', label:t('photography'), href:'photography.html',
-     sub:[{label:t('all_photos'), href:'photography.html'}].concat(S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; }))},
+     sub:[{label:t('all_albums'), href:'photography.html'}].concat(S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; }))},
     {key:'collections', label:t('collections'), href:'collections.html',
      sub:[{label:t('all_collections'), href:'collections.html'}].concat(S.collections.map(function(c){ return {label:L(c.name), href:'collections.html#'+c.id}; }))},
     {key:'life', label:t('life'), href:'life.html',
@@ -537,9 +537,9 @@ function renderHome(){
    into the shortest column, so photos keep the order written in data.js. */
 function renderGallery(cfg){
   main.innerHTML = '<div class="shell">' + pageHead(t(cfg.h), cfg.p ? t(cfg.p) : '') + (cfg.top || '') +
-    '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p><div class="jgrid" id="grid"></div></div>';
+    '<nav class="chips" id="chips" aria-label="'+esc(t(cfg.aria))+'"></nav><p class="count" id="count" aria-live="polite"></p>' + (cfg.covers ? '<div class="albums" id="albums"></div>' : '') + '<div class="jgrid" id="grid"></div></div>';
   var featBox = $('.yt'); if(featBox) featBox.addEventListener('click', function(e){ var y = e.target.closest('.yt-play'); if(y) playYouTube(y.parentNode); });
-  var grid = $('#grid'), items = [], nodes = [], laidW = 0;
+  var grid = $('#grid'), items = [], nodes = [], laidW = 0, prevH = null;
   function isTall(p){ return !p.video && p.h > p.w; }
   function layout(){
     var W = grid.clientWidth; if(!W || !nodes.length) return;
@@ -559,9 +559,25 @@ function renderGallery(cfg){
   function draw(){
     var h = location.hash.slice(1) || 'all';
     if(h !== 'all' && !cfg.albums.some(function(a){ return a.id === h; })) h = 'all';
-    $('#chips').innerHTML = [{id:'all', name:t('all')}].concat(cfg.albums).map(function(a){
+    $('#chips').innerHTML = [{id:'all', name:t(cfg.covers ? 'all_albums' : 'all')}].concat(cfg.albums).map(function(a){
       return '<a class="chip" href="#'+a.id+'" aria-current="'+(a.id === h)+'">'+esc(L(a.name))+'</a>';
     }).join('');
+    var overview = !!cfg.covers && h === 'all', ab = $('#albums');
+    if(cfg.covers){
+      if(prevH !== null && prevH !== h) window.scrollTo(0, 0);
+      prevH = h; ab.hidden = !overview; grid.hidden = overview;
+    }
+    if(overview){
+      items = []; nodes = []; grid.innerHTML = '';
+      $('#count').textContent = t('album_count', cfg.albums.length);
+      ab.innerHTML = cfg.albums.map(function(a){
+        var inA = cfg.items.filter(function(p){ return p.album === a.id && !p.video; });
+        var cv = inA.filter(function(p){ return p.id === a.cover; })[0] || inA.filter(function(p){ return p.w >= p.h; })[0] || inA[0];
+        return '<a class="album" href="#'+a.id+'">' + (cv ? '<img src="'+srcOf(cv, 800)+'" alt="" loading="lazy" referrerpolicy="no-referrer">' : '') +
+          '<span class="album-cap"><b>'+esc(L(a.name))+'</b><span>'+esc(t('photo_count', inA.length))+'</span></span></a>';
+      }).join('');
+      return;
+    }
     items = cfg.items.filter(function(p){ return h === 'all' || p.album === h; });
     $('#count').textContent = h === 'all' ? t(cfg.count, items.length) : t(cfg.countIn, items.length, albumNameIn(cfg.albums, h));
     var tmp = document.createElement('div');
@@ -591,7 +607,7 @@ function renderGallery(cfg){
   }
   onHash(draw); draw();
 }
-function renderPhotography(){ renderGallery({albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
+function renderPhotography(){ renderGallery({covers:true, albums:S.albums, items:S.photos, h:'photo_h', p:'photo_p', aria:'albums_aria', count:'photo_count', countIn:'photo_count_in'}); }
 function featHTML(f){
   return '<div class="yt feat"><div class="yt-copy"><h2 class="feat-t">'+esc(L(f.title))+'</h2></div>' +
     '<div class="yt-frame" data-v="'+esc(f.id)+'"><button type="button" class="yt-play" aria-label="'+esc(t('yt_play'))+'">' +

@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.7419.50629.38472', date: '2026-11-21'},
+  version: {number: '1.8532.614071.29365', date: '2026-11-21'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -40,15 +40,15 @@ window.SITE = {
      (accessKey is an optional alternative: a key from web3forms.com. Leave it empty.) */
   contact: {formId: 'e7150ffdfb35b916eef77496f1489613', accessKey: ''},
 
-  /* Photography: albums and photos. Pictures are fetched from Google Drive by file id. */
+  /* Photography: albums and photos. Pictures are fetched from Google Drive by file id. cover is the id of the photo shown as the album's cover on the Photography page (pick a horizontal one). */
   albums: [
-    {id: 'landscapes', name: {en: 'Landscapes', zh: '風景'}},
-    {id: 'city',       name: {en: 'City',       zh: '城市'}},
-    {id: 'travel',     name: {en: 'Travel',     zh: '旅行'}},
-    {id: 'sky',        name: {en: 'Sky',        zh: '天空'}},
-    {id: 'wildlife',   name: {en: 'Wildlife',   zh: '野生動物'}},
-    {id: 'pets',       name: {en: 'Pets',       zh: '寵物'}},
-    {id: 'objects',    name: {en: 'Objects',    zh: '小物'}}
+    {id: 'landscapes', name: {en: 'Landscapes', zh: '風景'}, cover: 'p20230127'},
+    {id: 'city',       name: {en: 'City',       zh: '城市'}, cover: 'p20220803'},
+    {id: 'travel',     name: {en: 'Travel',     zh: '旅行'}, cover: 'p0757'},
+    {id: 'sky',        name: {en: 'Sky',        zh: '天空'}, cover: 'p4140'},
+    {id: 'wildlife',   name: {en: 'Wildlife',   zh: '野生動物'}, cover: 'p3503'},
+    {id: 'pets',       name: {en: 'Pets',       zh: '寵物'}, cover: 'p3236'},
+    {id: 'objects',    name: {en: 'Objects',    zh: '小物'}, cover: 'p0051'}
   ],
   photos: [
       {id: 'p3141', album: 'city', drive: '1cGvF7HVpHBLF-T0w6F-J-Oc_UNSoKzoF', orig: '1ccNNJsw-Knt7nVCbwGGSAOI3ZbXTqFI_', wm: 1, w: 1536, h: 2048,
