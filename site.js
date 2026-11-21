@@ -144,11 +144,11 @@ function renderHeader(){
   var h = $('#top'), isOpen = h.classList.contains('open');
   var NAV = [
     {key:'photography', label:t('photography'), href:'photography.html',
-     sub:[{label:t('all_albums'), href:'photography.html'}].concat(S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; }))},
+     sub:S.albums.map(function(a){ return {label:L(a.name), href:'photography.html#'+a.id}; })},
     {key:'collections', label:t('collections'), href:'collections.html',
-     sub:[{label:t('all_collections'), href:'collections.html'}].concat(S.collections.map(function(c){ return {label:L(c.name), href:'collections.html#'+c.id}; }))},
+     sub:S.collections.map(function(c){ return {label:L(c.name), href:'collections.html#'+c.id}; })},
     {key:'life', label:t('life'), href:'life.html',
-     sub:[{label:t('all_life'), href:'life.html'}].concat(S.life.albums.map(function(a){ return {label:L(a.name), href:'life.html#'+a.id}; }))},
+     sub:S.life.albums.map(function(a){ return {label:L(a.name), href:'life.html#'+a.id}; })},
     {key:'career', label:t('career'), href:'career.html'},
     {key:'about', label:t('about'), href:'about.html'}
   ];
