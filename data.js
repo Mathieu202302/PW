@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9334.92740518361.617302845193', date: '2026-11-21'},
+  version: {number: '1.9337.104837295016.7280419365027', date: '2026-11-21'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -45,7 +45,6 @@ window.SITE = {
     {id: 'landscapes', name: {en: 'Landscapes', zh: '風景'}, cover: 'p20230127'},
     {id: 'city',       name: {en: 'City',       zh: '城市'}, cover: 'p20220803'},
     {id: 'travel',     name: {en: 'Travel',     zh: '旅行'}, cover: 'p0757'},
-    {id: 'sky',        name: {en: 'Sky',        zh: '天空'}, cover: 'p4140'},
     {id: 'wildlife',   name: {en: 'Wildlife',   zh: '野生動物'}, cover: 'p3503'},
     {id: 'pets',       name: {en: 'Pets',       zh: '寵物'}, cover: 'p3236'},
     {id: 'objects',    name: {en: 'Objects',    zh: '小物'}, cover: 'p0051'},
@@ -67,7 +66,7 @@ window.SITE = {
       {id: 'p3236', album: 'pets', drive: '17qGlXPdShhoINkfA6pTNXg6boEAgfEec', orig: '1ygSYpXHSI8H2N6JoBpL-EzZc_zczVsta', wm: 1, w: 1600, h: 1067,
        title: {en: 'Olaf, wrapped up', zh: 'Olaf 裹著毯子'},
        caption: {en: 'Olaf, my cream long-haired dachshund, tucked into a blanket.', zh: '我的奶油色長毛臘腸狗 Olaf，窩在毯子裡。'}},
-      {id: 'p4166', album: 'sky', drive: '1qjW47gTl5F6X7Q9w8ZVzXPhcHzIWBL0n', orig: '1ZW84CBBmwcTZE7bWA-grybpuw7aFmheu', wm: 1, w: 1600, h: 2400,
+      {id: 'p4166', album: 'city', drive: '1qjW47gTl5F6X7Q9w8ZVzXPhcHzIWBL0n', orig: '1ZW84CBBmwcTZE7bWA-grybpuw7aFmheu', wm: 1, w: 1600, h: 2400,
        title: {en: 'Balloons over the hills', zh: '山丘上的熱氣球'},
        caption: {en: 'Hot air balloons above the hills, with a red trolley crossing a viaduct below. Taken at UCSD.', zh: '熱氣球飄在山丘上方，下方有一列紅色輕軌電車駛過高架橋。攝於 UCSD。'}},
       {id: 'p4083', album: 'landscapes', drive: '1v1bkjbbC4wUTd5zTO1SJezKrUE3C8g9Y', orig: '1_TRA0MChABvGhZ4odqM1bFC7q-aPSoMn', wm: 1, w: 1600, h: 1067,
@@ -85,7 +84,7 @@ window.SITE = {
       {id: 'p3467', album: 'wildlife', drive: '1EMLHC5P6bhwDo6802Rk6IgFxq1wSOAZ0', orig: '1gSdCMdSWAHNmknke_8Wit6wHjIIBVcEG', wm: 1, w: 1600, h: 1067,
        title: {en: 'Black drongo', zh: '黑捲尾'},
        caption: {en: 'A black drongo perched on a branch.', zh: '棲息在枝頭的黑捲尾。'}},
-      {id: 'p4140', album: 'sky', drive: '1HRgAxSY6b4sTOQqgu8aM49Hf96RlzkGi', orig: '1wcfH1LmZ_llI-lq94I6S06XEl2tBCPIr', wm: 1, w: 1600, h: 1067,
+      {id: 'p4140', album: 'city', drive: '1HRgAxSY6b4sTOQqgu8aM49Hf96RlzkGi', orig: '1wcfH1LmZ_llI-lq94I6S06XEl2tBCPIr', wm: 1, w: 1600, h: 1067,
        title: {en: 'Airship', zh: '飛艇'},
        caption: {en: 'An airship and banners in a blue sky, seen from UCSD.', zh: '藍天中的飛艇與旗幟，攝於 UCSD。'}},
       {id: 'p4214', album: 'landscapes', drive: '1WJgvmHiaeHnuKLM7YrXqCQ6Y40CCOCS1', orig: '1q8FLGy0GlCXWNkhbj7vocRaREEWNQ4XG', wm: 1, w: 1600, h: 1067,
@@ -121,7 +120,7 @@ window.SITE = {
       {id: 'p4031', album: 'landscapes', drive: '17ubFENaLoKBMMh2iokAZ7ygWcppmIB2r', orig: '1zw7DjDH3Y1ApJ6MnzfAMOJb4N4bYX_Gp', wm: 1, w: 1600, h: 1067,
        title: {en: 'The Scripps Pier', zh: 'Scripps 碼頭'},
        caption: {en: 'The famous Scripps Pier of UCSD reaching into a hazy sea, seen from the hills.', zh: 'UCSD 著名的 Scripps 碼頭向霧濛濛的海面延伸，從山丘上遠望。'}},
-      {id: 'p4191', album: 'sky', drive: '1MSUHwSEC_0JPT1Dm332RHUJgFpISwrzr', orig: '1JbO587JskO9kFg8x2Velkx_5HsMMQYYy', wm: 1, w: 1600, h: 2400,
+      {id: 'p4191', album: 'city', drive: '1MSUHwSEC_0JPT1Dm332RHUJgFpISwrzr', orig: '1JbO587JskO9kFg8x2Velkx_5HsMMQYYy', wm: 1, w: 1600, h: 2400,
        title: {en: 'Balloons and the San Diego Trolley', zh: '熱氣球與聖地牙哥輕軌電車'},
        caption: {en: 'Hot air balloons drifting over the hills, with a red San Diego Trolley below.', zh: '熱氣球飄過山丘，下方有一列紅色的聖地牙哥輕軌電車。'}},
       {id: 'p4038', album: 'city', drive: '1Su6k7kBim3B70OZgb7zV70HoTwcJW1jW', orig: '1-FHPMfK0TEyAuYE18fuq3-PhP5GvAar9', wm: 1, w: 1600, h: 1067,
