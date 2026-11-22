@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9343.31846705293.4057291863152', date: '2026-11-21'},
+  version: {number: '1.9346.4081736295014.62915307418396', date: '2026-11-21'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -574,7 +574,7 @@ window.SITE = {
        {id: 'm116', brand: {en: 'Porsche', zh: '保時捷'}, drive: '1NO9bI13fl8yqfn3hga72qoOe9RUFtiYR', wm: 1, title: {en: 'Porsche Mission R', zh: '保時捷 Mission R'}, meta: {en: 'Spark', zh: 'Spark'}},
        {id: 'm117', brand: {en: 'Aston Martin', zh: '奧斯頓·馬丁'}, drive: '14nwwIJ5AgPLp9opCLY4Q9T0A9gRVDWxF', wm: 1, title: {en: 'Aston Martin DB11 CYRUS', zh: '奧斯頓·馬丁 DB11 CYRUS'}, meta: {en: 'TP', zh: 'TP'}},
        {id: 'm118', brand: {en: 'Ferrari', zh: '法拉利'}, drive: '1Db-eHXjZjhzrGoDrzxQnL_p9YRtNPwcE', wm: 1, title: {en: 'Ferrari FXX-K Evo', zh: '法拉利 FXX-K Evo'}, meta: {en: 'Tomica', zh: 'Tomica'}},
-       {id: 'm119', brand: {en: 'Koenigsegg', zh: '柯尼賽格'}, drive: '17mWBoXHMJ2Kw7IDBloU67_fHJKel_N1I', wm: 1, title: {en: 'Koenigsegg Jesko', zh: '柯尼賽格 Jesko'}, meta: {en: 'Maker unknown', zh: '廠牌不詳'}},
+       {id: 'm119', brand: {en: 'Koenigsegg', zh: '柯尼賽格'}, drive: '17mWBoXHMJ2Kw7IDBloU67_fHJKel_N1I', wm: 1, title: {en: 'Koenigsegg Jesko', zh: '柯尼賽格 Jesko'}, meta: {en: 'FrontiArt', zh: 'FrontiArt'}},
        {id: 'm120', brand: {en: 'Mini', zh: 'Mini'}, drive: '1PvP5ebg0iP1X3CBJXaRWd9SSTYIb_Lm7', wm: 1, title: {en: 'Mini Cooper, Martini Racing Livery', zh: 'Mini Cooper，Martini Racing 彩繪'}, meta: {en: 'Maker unknown', zh: '廠牌不詳'}},
        {id: 'm121', brand: {en: 'Porsche', zh: '保時捷'}, drive: '1PGgC3peR1pCRs5G9yYhi-tZ3-BHxk6hj', wm: 1, title: {en: 'Porsche 911 Widebody, Royal Ocean Dragon Livery', zh: '保時捷 911 Widebody，Royal Ocean 龍紋彩繪'}, meta: {en: 'Maker unknown', zh: '廠牌不詳'}}
      ]}
