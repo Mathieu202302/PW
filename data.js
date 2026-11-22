@@ -7,7 +7,7 @@
    for a file uploaded next to index.html. Entries with neither show generated placeholder art. */
 window.SITE = {
   /* Site version, shown in the footer after the legal line. Every update gets a new longer code (four parts, like 1.8897.288.90; the middle numbers can be anything) and the new date. */
-  version: {number: '1.9340.2175038491627.93150428617305', date: '2026-11-21'},
+  version: {number: '1.9343.31846705293.4057291863152', date: '2026-11-21'},
 
   /* Opening screen of the home page: a full-screen photo with the word Welcome written over it.
      drive is the file id of the photo; pos is the part of the photo kept in view (x y). */
@@ -451,7 +451,7 @@ window.SITE = {
         meta: {en: 'LEGO Icons 10300', zh: '樂高 Icons 10300'},
         caption: {en: 'The DeLorean, parked in front of Van Gogh\'s Starry Night (LEGO Ideas 21333).', zh: '停在梵谷《星夜》前的 DeLorean（《星夜》為 LEGO Ideas 21333）。'}}
      ]},
-    {id: 'model-car', cover: 'm25', land: 1, alpha: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: '1/18 high-end model cars. Contact me for buying options.', zh: '歡迎光臨馬修車庫！1/18 頂級品牌精品模型車，歡迎洽詢購買。'},
+    {id: 'model-car', cover: 'm25', land: 1, alpha: 1, name: {en: 'Model car', zh: '模型車'}, blurb: {en: '1/18 high-end model cars.', zh: '歡迎光臨馬修車庫！1/18 頂級品牌精品模型車。'},
      /* Shown at the top of this collection. id is the part after v= in the video link. */
      youtube: {id: 'gVmvFTwi5FQ', url: 'https://www.youtube.com/watch?v=gVmvFTwi5FQ',
                 channel: {id: 'UCHVu2xEPzSEkvoMBQZ6G0EQ', name: 'Matthew 馬修王'}},
